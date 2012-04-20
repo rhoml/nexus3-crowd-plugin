@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -15,20 +15,27 @@ package org.sonatype.nexus.plugins.crowd.client;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import com.atlassian.crowd.exception.GroupNotFoundException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.UserNotFoundException;
 import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
 import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
+import com.atlassian.crowd.integration.soap.SOAPEntity;
 
 /**
  * Adapter interface that allows Nexus to switch between Crowd groups and Crowd
  * roles.
- * 
+ *
  * @author Justin Edelson
  */
 public interface NexusRoleManager {
 
-    List<String> getNexusRoles(String username) throws RemoteException,
-            InvalidAuthorizationTokenException, ObjectNotFoundException;
+    List<String> getNexusRoles(String username) throws RemoteException, InvalidAuthorizationTokenException,
+            ObjectNotFoundException, UserNotFoundException, InvalidAuthenticationException, com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
 
-    List<String> getAllNexusRoles() throws RemoteException, InvalidAuthorizationTokenException;
+    SOAPEntity getNexusRole(String roleName) throws ObjectNotFoundException, InvalidAuthorizationTokenException,
+            RemoteException, GroupNotFoundException, InvalidAuthenticationException, com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
+
+    List<String> getAllNexusRoles() throws RemoteException, InvalidAuthorizationTokenException, InvalidAuthenticationException, com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
 
 }

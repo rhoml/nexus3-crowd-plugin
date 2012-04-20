@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,13 +13,13 @@
 package org.sonatype.nexus.plugins.crowd.config;
 
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
-import org.sonatype.nexus.proxy.events.EventMulticaster;
+import org.sonatype.plexus.appevents.EventMulticaster;
 
 /**
  * Interface that manages Crowd Plugin Configuration data.
- * 
+ *
  * @author jedelson
- * 
+ *
  */
 public interface CrowdPluginConfiguration extends EventMulticaster {
 

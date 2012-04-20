@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -19,11 +19,15 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.atlassian.crowd.exception.GroupNotFoundException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.UserNotFoundException;
 import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
 import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
-import com.atlassian.crowd.integration.service.GroupManager;
-import com.atlassian.crowd.integration.service.GroupMembershipManager;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
+import com.atlassian.crowd.integration.soap.SOAPEntity;
+import com.atlassian.crowd.service.GroupManager;
+import com.atlassian.crowd.service.GroupMembershipManager;
+import com.atlassian.crowd.service.soap.client.SecurityServerClient;
 
 public class DefaultNexusRoleManager implements NexusRoleManager {
 
@@ -42,8 +46,8 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
         this.securityServerClient = securityServerClient;
     }
 
-    public List<String> getAllNexusRoles() throws RemoteException,
-            InvalidAuthorizationTokenException {
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public List<String> getAllNexusRoles() throws RemoteException, InvalidAuthenticationException, com.atlassian.crowd.exception.InvalidAuthorizationTokenException {
         List<String> roles;
         if (useGroups) {
             roles = groupManager.getAllGroupNames();
@@ -53,8 +57,9 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
         return roles;
     }
 
+    @SuppressWarnings({ "deprecation", "unchecked" })
     public List<String> getNexusRoles(String username) throws RemoteException,
-            InvalidAuthorizationTokenException, ObjectNotFoundException {
+            InvalidAuthorizationTokenException, ObjectNotFoundException, UserNotFoundException, InvalidAuthenticationException, com.atlassian.crowd.exception.InvalidAuthorizationTokenException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Looking up role list for username: " + username);
         }
@@ -70,6 +75,20 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
         }
 
         return roles;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws com.atlassian.crowd.exception.InvalidAuthorizationTokenException 
+     * @throws InvalidAuthenticationException 
+     * @throws GroupNotFoundException 
+     */
+    public SOAPEntity getNexusRole(String roleName) throws RemoteException, InvalidAuthorizationTokenException, ObjectNotFoundException, GroupNotFoundException, InvalidAuthenticationException, com.atlassian.crowd.exception.InvalidAuthorizationTokenException {
+        if (useGroups) {
+            return groupManager.getGroup(roleName);
+        } else {
+            return securityServerClient.findRoleByName(roleName);
+        }
     }
 
 }

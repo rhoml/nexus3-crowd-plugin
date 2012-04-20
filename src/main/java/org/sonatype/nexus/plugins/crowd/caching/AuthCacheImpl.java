@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -19,7 +19,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-import com.atlassian.crowd.integration.service.cache.CacheImpl;
+import com.atlassian.crowd.service.cache.CacheImpl;
 
 /**
  * Extension of Crowd CacheImpl object which supports caching of authentication

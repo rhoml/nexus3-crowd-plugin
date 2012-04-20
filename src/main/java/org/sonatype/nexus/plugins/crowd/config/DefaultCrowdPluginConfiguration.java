@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,10 +22,10 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.io.xpp3.NexusCrowdPluginConfigurationXpp3Reader;
-import org.sonatype.nexus.proxy.EventMulticasterComponent;
+import org.sonatype.plexus.appevents.SimpleEventMulticaster;
 
 @Component(role = CrowdPluginConfiguration.class, hint = "default")
-public class DefaultCrowdPluginConfiguration extends EventMulticasterComponent implements
+public class DefaultCrowdPluginConfiguration extends SimpleEventMulticaster implements
         CrowdPluginConfiguration {
 
     @org.codehaus.plexus.component.annotations.Configuration(value = "${nexus-work}/conf/crowd-plugin.xml")

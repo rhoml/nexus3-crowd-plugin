@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -17,15 +17,10 @@ package org.sonatype.nexus.plugins.crowd.caching;
 
 import java.rmi.RemoteException;
 
-import com.atlassian.crowd.integration.authentication.PrincipalAuthenticationContext;
-import com.atlassian.crowd.integration.authentication.ValidationFactor;
-import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
-import com.atlassian.crowd.integration.exception.InactiveAccountException;
-import com.atlassian.crowd.integration.exception.InvalidAuthenticationException;
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
-import com.atlassian.crowd.integration.service.cache.AuthenticationManagerImpl;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
-import com.atlassian.crowd.integration.util.Assert;
+import com.atlassian.crowd.exception.ExpiredCredentialException;
+import com.atlassian.crowd.service.cache.SimpleAuthenticationManager;
+import com.atlassian.crowd.service.soap.client.SecurityServerClient;
+import com.atlassian.crowd.util.Assert;
 
 /**
  * Implementation of Crowd client's AuthenticationManager which caches tokens
@@ -34,7 +29,7 @@ import com.atlassian.crowd.integration.util.Assert;
  * @author Justin Edelson
  * 
  */
-public class CachingAuthenticationManager extends AuthenticationManagerImpl {
+public class CachingAuthenticationManager extends SimpleAuthenticationManager {
 
     private AuthBasicCache basicCache;
 
@@ -43,37 +38,23 @@ public class CachingAuthenticationManager extends AuthenticationManagerImpl {
         super(securityServerClient);
         this.basicCache = basicCache;
     }
-
-    public String authenticate(PrincipalAuthenticationContext authenticationContext)
-            throws RemoteException, InvalidAuthorizationTokenException,
-            InvalidAuthenticationException, InactiveAccountException,
-            ApplicationAccessDeniedException {
-        return super.authenticate(authenticationContext);
-    }
-
+  
+    @Override
     public String authenticate(String username, String password) throws RemoteException,
-            InvalidAuthorizationTokenException, InvalidAuthenticationException,
-            InactiveAccountException, ApplicationAccessDeniedException {
+            com.atlassian.crowd.exception.InvalidAuthorizationTokenException,
+            com.atlassian.crowd.exception.InvalidAuthenticationException,
+            com.atlassian.crowd.exception.InactiveAccountException,
+            com.atlassian.crowd.exception.ApplicationAccessDeniedException, ExpiredCredentialException {
         Assert.notNull(username);
         Assert.notNull(password);
 
         String token = basicCache.getToken(username, password);
         if (token == null) {
-            token = super.authenticate(username, password);
+                token = super.authenticate(username, password);
+
             basicCache.addOrReplaceToken(username, password, token);
         }
         return token;
     }
-
-    public void invalidate(String token) throws RemoteException, InvalidAuthorizationTokenException {
-        super.invalidate(token);
-
-    }
-
-    public boolean isAuthenticated(String token, ValidationFactor[] validationFactors)
-            throws RemoteException, InvalidAuthorizationTokenException,
-            ApplicationAccessDeniedException {
-        return super.isAuthenticated(token, validationFactors);
-    }
-
+ 
 }
