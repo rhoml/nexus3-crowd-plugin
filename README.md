@@ -10,3 +10,7 @@ The crowd integration is using the almost obsolete SOAP interface (REST is now p
 
 The aim of this project is to offer an integration between Nexus and Crowd that can be installed on Nexus 2.x and offers the same level of functionnality than its Nexus 1.8 counter part.
 
+There are some works that need to be done on the crowd part:
+- moving to the REST api (instead of SOAP)
+- removing the role related code (as crowd will only support groups starting in the next version)
+
