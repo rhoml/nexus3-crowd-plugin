@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 /**
- * 
+ *
  */
 package org.sonatype.nexus.plugins.crowd.client;
 
@@ -27,27 +27,28 @@ import org.sonatype.nexus.plugins.crowd.config.CrowdPluginConfiguration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 
-import com.atlassian.crowd.integration.service.AuthenticationManager;
-import com.atlassian.crowd.integration.service.GroupManager;
-import com.atlassian.crowd.integration.service.GroupMembershipManager;
-import com.atlassian.crowd.integration.service.UserManager;
-import com.atlassian.crowd.integration.service.cache.CachingGroupManager;
-import com.atlassian.crowd.integration.service.cache.CachingGroupMembershipManager;
-import com.atlassian.crowd.integration.service.cache.CachingUserManager;
-import com.atlassian.crowd.integration.service.soap.client.ClientProperties;
-import com.atlassian.crowd.integration.service.soap.client.ClientPropertiesImpl;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClientImpl;
+import com.atlassian.crowd.service.AuthenticationManager;
+import com.atlassian.crowd.service.GroupManager;
+import com.atlassian.crowd.service.GroupMembershipManager;
+import com.atlassian.crowd.service.UserManager;
+import com.atlassian.crowd.service.cache.CachingGroupManager;
+import com.atlassian.crowd.service.cache.CachingGroupMembershipManager;
+import com.atlassian.crowd.service.cache.CachingUserManager;
+import com.atlassian.crowd.service.soap.client.SecurityServerClient;
+import com.atlassian.crowd.service.soap.client.SecurityServerClientImpl;
+import com.atlassian.crowd.service.soap.client.SoapClientProperties;
+import com.atlassian.crowd.service.soap.client.SoapClientPropertiesImpl;
 
 /**
  * Implementation of the CrowdClientHolder which uses caching wherever possible.
- * 
+ *
  * @author Justin Edelson
- * 
+ *
  */
 @Component(role = CrowdClientHolder.class, hint = "default")
-public class DefaultCrowdClientHolder extends AbstractLogEnabled implements CrowdClientHolder,
-        Initializable {
+public class DefaultCrowdClientHolder extends AbstractLogEnabled implements CrowdClientHolder, Initializable {
+
+    private boolean configured = false;
 
     private AuthenticationManager authenticationManager;
 
@@ -102,17 +103,26 @@ public class DefaultCrowdClientHolder extends AbstractLogEnabled implements Crow
     public void initialize() throws InitializationException {
         basicCache = new AuthCacheImpl(cacheManager.getEhCacheManager());
         configuration = crowdPluginConfiguration.getConfiguration();
-        ClientProperties clientProps = new ClientPropertiesImpl(configuration
-                .getCrowdClientProperties());
-        securityServerClient = new SecurityServerClientImpl(clientProps);
-        userManager = new CachingUserManager(securityServerClient, basicCache);
-        groupManager = new CachingGroupManager(securityServerClient, basicCache);
-        groupMembershipManager = new CachingGroupMembershipManager(securityServerClient,
-                userManager, groupManager, basicCache);
-        authenticationManager = new CachingAuthenticationManager(securityServerClient, basicCache);
-        nexusRoleManager = new DefaultNexusRoleManager(configuration.isUseGroups(), groupManager,
-                groupMembershipManager, securityServerClient);
+        if (configuration != null) {
+            SoapClientProperties clientProps = SoapClientPropertiesImpl.newInstanceFromProperties(configuration.getCrowdClientProperties());
+            securityServerClient = new SecurityServerClientImpl(clientProps);
+            userManager = new CachingUserManager(securityServerClient, basicCache);
+            groupManager = new CachingGroupManager(securityServerClient, basicCache);
+            groupMembershipManager = new CachingGroupMembershipManager(securityServerClient, userManager, groupManager,
+                    basicCache);
+            authenticationManager = new CachingAuthenticationManager(securityServerClient, basicCache);
+            nexusRoleManager = new DefaultNexusRoleManager(configuration.isUseGroups(), groupManager,
+                    groupMembershipManager, securityServerClient);
+            configured = true;
+        }
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isConfigured() {
+        return configured;
     }
 
 }

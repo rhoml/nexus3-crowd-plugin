@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -10,34 +10,28 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.nexus.jsecurity.realms.external.crowd;
+package org.sonatype.nexus.plugins.crowd.client;
 
-import static org.junit.Assert.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+/**
+ * This class logs the unconfigured message once per session.
+ *
+ * @author justinedelson
+ *
+ */
+class UnconfiguredNotifier {
 
-public class CrowdAuthenticatingRealmTest {
+    static Logger logger = LoggerFactory.getLogger(UnconfiguredNotifier.class);
 
-    private CrowdAuthenticatingRealm realm;
+    static boolean notified = false;
 
-    @Before
-    public void setup() {
-        realm = new CrowdAuthenticatingRealm();
-
-    }
-
-    @Test
-    public void checkActiveFlag() throws Exception {
-        assertFalse(realm.isActive());
-        realm.initialize();
-        assertTrue(realm.isActive());
-    }
-
-    @After
-    public void teardown() {
-        realm.dispose();
+    static void unconfigured() {
+        if (!notified) {
+            logger.warn("Crowd plugin is not configured. This will only be logged once.");
+            notified = true;
+        }
     }
 
 }
