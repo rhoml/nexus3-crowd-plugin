@@ -9,9 +9,9 @@
 	<name>Nexus Crowd Integration</name>
 	<description>Integration between Nexus MRM and Crowd Identity Server.</description>
     <scm>
-        <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-plugin</url>
-        <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-plugin</connection>
-        <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-plugin</developerConnection>
+        <url>https://github.com/PatrickRoumanoff/nexus-crowd-plugin</url>
+	<connection>scm:git:git@github.com:PatrickRoumanoff/nexus-crowd-plugin</connection>
+	<developerConnection>scm:git:git@github.com:PatrickRoumanoff/nexus-crowd-plugin</developerConnection>
     </scm>
 
     <developers>
@@ -19,6 +19,14 @@
             <id>jedelson</id>
             <name>Justin Edelson</name>
             <email>justin.edelson@mtvstaff.com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>PatrickRoumanoff</id>
+            <name>Patrick Roumanoff</name>
+            <email>patrick@roumanoff.com</email>
             <roles>
                 <role>developer</role>
             </roles>
