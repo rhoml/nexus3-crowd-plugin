@@ -31,7 +31,7 @@ import com.atlassian.crowd.service.soap.client.SecurityServerClient;
 
 public class DefaultNexusRoleManager implements NexusRoleManager {
 
-    private static final Log LOGGER = LogFactory.getLog(DefaultNexusRoleManager.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultNexusRoleManager.class);
 
     private boolean useGroups;
     private GroupManager groupManager;
@@ -60,8 +60,8 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
     @SuppressWarnings({ "deprecation", "unchecked" })
     public List<String> getNexusRoles(String username) throws RemoteException,
             InvalidAuthorizationTokenException, ObjectNotFoundException, UserNotFoundException, InvalidAuthenticationException, com.atlassian.crowd.exception.InvalidAuthorizationTokenException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Looking up role list for username: " + username);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Looking up role list for username: " + username);
         }
 
         List<String> roles;
@@ -70,8 +70,8 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
         } else {
             roles = Arrays.asList(securityServerClient.findRoleMemberships(username));
         }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Obtained role list: " + roles.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Obtained role list: " + roles.toString());
         }
 
         return roles;
