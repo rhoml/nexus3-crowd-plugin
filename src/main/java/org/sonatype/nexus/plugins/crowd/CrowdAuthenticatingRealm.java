@@ -13,6 +13,8 @@
 package org.sonatype.nexus.plugins.crowd;
 
 import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.List;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -20,7 +22,9 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -33,68 +37,88 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.crowd.client.CrowdClientHolder;
 
-import com.atlassian.crowd.exception.ExpiredCredentialException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
 
 @Component(role = Realm.class, hint = CrowdAuthenticatingRealm.ROLE, description = "OSS Crowd Authentication Realm")
 public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initializable, Disposable {
 
-    public static final String ROLE = "NexusCrowdAuthenticationRealm";
-    private static boolean active;
+	private static final String DEFAULT_MESSAGE = "Could not retrieve info from Crowd.";
+	public static final String ROLE = "NexusCrowdAuthenticationRealm";
+	private static boolean active;
 
-    @Requirement
-    private CrowdClientHolder crowdClientHolder;
+	@Requirement
+	private CrowdClientHolder crowdClientHolder;
 
-    private Logger logger = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);
+	private Logger logger = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);
 
-    public static boolean isActive() {
-        return active;
-    }
+	public static boolean isActive() {
+		return active;
+	}
 
-    public void dispose() {
-        active = false;
-        logger.info("Crowd Realm deactivated...");
-    }
+	public void dispose() {
+		active = false;
+		logger.info("Crowd Realm deactivated...");
+	}
 
-    @Override
-    public String getName() {
-        return CrowdAuthenticatingRealm.class.getName();
-    }
+	@Override
+	public String getName() {
+		return CrowdAuthenticatingRealm.class.getName();
+	}
 
-    public void initialize() throws InitializationException {
-        logger.info("Crowd Realm activated...");
-        active = true;
-    }
+	public void initialize() throws InitializationException {
+		logger.info("Crowd Realm activated...");
+		active = true;
+	}
 
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        if (!(authenticationToken instanceof UsernamePasswordToken)) {
-            throw new UnsupportedTokenException("Token of type " + authenticationToken.getClass().getName()
-                    + " is not supported.  A " + UsernamePasswordToken.class.getName() + " is required.");
-        }
-        UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
+	@Override
+	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken)
+			throws AuthenticationException {
+		if (!(authenticationToken instanceof UsernamePasswordToken)) {
+			throw new UnsupportedTokenException("Token of type " + authenticationToken.getClass().getName()
+					+ " is not supported.  A " + UsernamePasswordToken.class.getName() + " is required.");
+		}
+		UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
 
-        String password = new String(token.getPassword());
+		String password = new String(token.getPassword());
 
-        try {
-            crowdClientHolder.getAuthenticationManager().authenticate(token.getUsername(), password);
-            return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), getName());
-        } catch (RemoteException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (com.atlassian.crowd.exception.InactiveAccountException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (ExpiredCredentialException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (com.atlassian.crowd.exception.InvalidAuthenticationException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (com.atlassian.crowd.exception.InvalidAuthorizationTokenException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (com.atlassian.crowd.exception.ApplicationAccessDeniedException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        }
-    }
+		try {
+			crowdClientHolder.getAuthenticationManager().authenticate(token.getUsername(), password);
+			return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), getName());
+		} catch (RemoteException e) {
+			throw new AuthenticationException(DEFAULT_MESSAGE, e);
+		} catch (com.atlassian.crowd.exception.InactiveAccountException e) {
+			throw new AuthenticationException(DEFAULT_MESSAGE, e);
+		} catch (com.atlassian.crowd.exception.ExpiredCredentialException e) {
+			throw new AuthenticationException(DEFAULT_MESSAGE, e);
+		} catch (com.atlassian.crowd.exception.InvalidAuthenticationException e) {
+			throw new AuthenticationException(DEFAULT_MESSAGE, e);
+		} catch (com.atlassian.crowd.exception.InvalidAuthorizationTokenException e) {
+			throw new AuthenticationException(DEFAULT_MESSAGE, e);
+		} catch (com.atlassian.crowd.exception.ApplicationAccessDeniedException e) {
+			throw new AuthenticationException(DEFAULT_MESSAGE, e);
+		}
+	}
 
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        return null;
-    }
+	@Override
+	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+		String username = (String) principals.getPrimaryPrincipal();
+		try {
+			List<String> roles = crowdClientHolder.getNexusRoleManager().getNexusRoles(username);
+			return new SimpleAuthorizationInfo(new HashSet<String>(roles));
+		} catch (com.atlassian.crowd.exception.UserNotFoundException e) {
+			throw new AuthorizationException(DEFAULT_MESSAGE, e);
+		} catch (RemoteException e) {
+			throw new AuthorizationException(DEFAULT_MESSAGE, e);
+		} catch (com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException e) {
+			throw new AuthorizationException(DEFAULT_MESSAGE, e);
+		} catch (ObjectNotFoundException e) {
+			throw new AuthorizationException(DEFAULT_MESSAGE, e);
+		} catch (InvalidAuthenticationException e) {
+			throw new AuthorizationException(DEFAULT_MESSAGE, e);
+		} catch (InvalidAuthorizationTokenException e) {
+			throw new AuthorizationException(DEFAULT_MESSAGE, e);
+		}
+	}
 }
