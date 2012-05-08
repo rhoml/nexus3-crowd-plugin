@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Nexus-crowd-plugin by PatrickRoumanoff</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Nexus-crowd-plugin</h1>
+        <h2>This is a fork from sonatype/nexus-crowd-plugin to support up to date versions of nexus and crowd</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/PatrickRoumanoff/nexus-crowd-plugin/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/PatrickRoumanoff/nexus-crowd-plugin/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/PatrickRoumanoff/nexus-crowd-plugin" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h3>Welcome to Nexus-crowd-plugin.</h3>
+
+<p>This fork is to keep an up to date version of the nexus-crowd-plugin. With so many updates both on the nexus and crowd front, it's hard to keep track! And those two awesome products work so well together....</p>
+
+<h3>Usage</h3>
+
+<ol>
+<li><p>Add a <code>nexus</code> application to Crowd with a <code>SECRET</code> secret</p></li>
+<li><p>Create a file called <code>crowd-plugin.xml</code> under <code>sonatype-work/nexus/conf</code></p></li>
+</ol><blockquote>
+<p><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;crowdConfiguration&gt;
+  &lt;crowdServerUrl&gt;http://[crowdhost]:[crowdport]/crowd/services/&lt;/crowdServerUrl&gt;
+  &lt;applicationName&gt;nexus&lt;/applicationName&gt;
+  &lt;applicationPassword&gt;SECRET&lt;/applicationPassword&gt;
+  &lt;useGroups&gt;true&lt;/useGroups&gt;
+&lt;/crowdConfiguration&gt;</code></p>
+</blockquote>
+
+<ol>
+<li><p>unzip the bundle under <code>sonatype-work/nexus/plugin-repository</code></p></li>
+<li><p>Start Nexus and use the Administration-&gt;Server panel to add <code>OSS Crowd Authentication Realm</code> to the list of active realms.</p></li>
+</ol><h3>Plugin Download</h3>
+
+<p><a href="https://github.com/downloads/PatrickRoumanoff/nexus-crowd-plugin/nexus-crowd-plugin-2.0.4-bundle.zip">nexus-crowd-plugin-2.0.4-bundle.zip</a> is the second release for Nexus 2.0.4 and Crowd 2.4.0 - This one is actually working for both Authentication and Authorisation.</p>
+
+<h3>Plan for next iterations</h3>
+
+<ul>
+<li>use the REST API</li>
+<li>use a properties file (instead of XML)</li>
+<li>enable a group filter</li>
+<li>provide a configuration UI</li>
+<li>enable Single Sign On (SSO)</li>
+</ul><h3>Authors and Contributors</h3>
+
+<p><a href="https://github.com/PatrickRoumanoff" class="user-mention">@PatrickRoumanoff</a> based on initial work by <a href="https://github.com/justinedelson" class="user-mention">@justinedelson</a> from <a href="https://github.com/sonatype" class="user-mention">@sonatype</a></p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
