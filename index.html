@@ -37,12 +37,13 @@
 <ol>
 <li><p>Add a <code>nexus</code> application to Crowd with a <code>SECRET</code> secret</p></li>
 <li><p>Create a file called <code>crowd-plugin.xml</code> under <code>sonatype-work/nexus/conf</code></p></li>
-</ol><p><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+</ol><pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;crowdConfiguration&gt;
   &lt;crowdServerUrl&gt;http://[crowdhost]:[crowdport]/crowd/&lt;/crowdServerUrl&gt;
   &lt;applicationName&gt;nexus&lt;/applicationName&gt;
   &lt;applicationPassword&gt;SECRET&lt;/applicationPassword&gt;
-&lt;/crowdConfiguration&gt;</code></p>
+&lt;/crowdConfiguration&gt;
+</code></pre>
 
 <ol>
 <li><p>unzip the bundle under <code>sonatype-work/nexus/plugin-repository</code></p></li>
