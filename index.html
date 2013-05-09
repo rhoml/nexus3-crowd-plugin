@@ -37,22 +37,19 @@
 <ol>
 <li><p>Add a <code>nexus</code> application to Crowd with a <code>SECRET</code> secret</p></li>
 <li><p>Create a file called <code>crowd-plugin.xml</code> under <code>sonatype-work/nexus/conf</code></p></li>
-</ol><blockquote>
-<p><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+</ol><p><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;crowdConfiguration&gt;
   &lt;crowdServerUrl&gt;http://[crowdhost]:[crowdport]/crowd/&lt;/crowdServerUrl&gt;
   &lt;applicationName&gt;nexus&lt;/applicationName&gt;
   &lt;applicationPassword&gt;SECRET&lt;/applicationPassword&gt;
-  &lt;useGroups&gt;true&lt;/useGroups&gt;
 &lt;/crowdConfiguration&gt;</code></p>
-</blockquote>
 
 <ol>
 <li><p>unzip the bundle under <code>sonatype-work/nexus/plugin-repository</code></p></li>
 <li><p>Start Nexus and use the Administration-&gt;Server panel to add <code>OSS Crowd Authentication Realm</code> to the list of active realms.</p></li>
 </ol><h3>Plugin Download</h3>
 
-<p><a href="https://github.com/PatrickRoumanoff/nexus-crowd-plugin/wiki/nexus-crowd-plugin-2.0.7-bundle.zip">nexus-crowd-plugin-2.0.7-bundle.zip</a> is the first release for Nexus 2.3.x and Crowd 2.6.x.</p>
+<p><a href="https://github.com/PatrickRoumanoff/nexus-crowd-plugin/wiki/nexus-crowd-plugin-2.0.7-bundle.zip">nexus-crowd-plugin-2.0.7-bundle.zip</a> is the current release for Nexus 2.x and Crowd 2.x.</p>
 
 <h3>Plan for next iterations</h3>
 
