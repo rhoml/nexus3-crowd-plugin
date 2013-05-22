@@ -41,7 +41,7 @@
 	<repositories>
 		<repository>
 			<id>nuxeo</id>
-			<url>https://maven-us.nuxeo.org/nexus/content/repositories/public</url>
+			<url>https://repository.sonatype.org/content/groups/public</url>
 		</repository>
 	</repositories>
 
