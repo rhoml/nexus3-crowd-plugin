@@ -1,5 +1,6 @@
-Nexus Crowd Plugin
+Nexus Crowd Plugin [![Build Status](https://travis-ci.org/PatrickRoumanoff/nexus-crowd-plugin.png)](https://travis-ci.org/PatrickRoumanoff/nexus-crowd-plugin)
 ==================
+
 
 This plugin works with Nexus 2.x and Crowd 2.x
 
