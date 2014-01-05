@@ -24,7 +24,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.io.xpp3.NexusCrowdPluginConfigurationXpp3Reader;
 import org.sonatype.sisu.goodies.eventbus.internal.DefaultEventBus;
@@ -35,8 +34,8 @@ public class DefaultCrowdPluginConfiguration extends DefaultEventBus implements
         CrowdPluginConfiguration {
 
 	@Inject
-	public DefaultCrowdPluginConfiguration(EventBus eventBus, BeanLocator beanLocator) {
-		super(eventBus, beanLocator);
+	public DefaultCrowdPluginConfiguration(EventBus eventBus) {
+		super(eventBus);
 	}
 
 	private final Logger logger = LoggerFactory.getLogger(DefaultCrowdPluginConfiguration.class);
