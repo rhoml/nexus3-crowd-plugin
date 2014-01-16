@@ -33,7 +33,13 @@
         </developer>
     </developers>
     
+<prerequisites>
+  <maven>3.0</maven>
+</prerequisites>
 	<properties>
+		<maven.compiler.source>6</maven.compiler.source>
+		<maven.compiler.target>6</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<nexus.version>2.7.0-01</nexus.version>
 		<nexus-plugin-test-api.version>2.5.1-01</nexus-plugin-test-api.version>
 		<app-lifecycle.version>1.7</app-lifecycle.version>
@@ -41,8 +47,8 @@
 	
 	<repositories>
 		<repository>
-			<id>nuxeo</id>
-			<url>https://repository.sonatype.org/content/groups/public</url>
+			<id>Sonatype</id>
+			<url>https://repository.sonatype.org/content/groups/sonatype-public-grid/</url>
 		</repository>
 	</repositories>
 
@@ -119,16 +125,6 @@
 				</dependencies>
 			</plugin>
 			
-			<!-- Have to set source level to at least Java5, we use annotations (Nexus requries 1.6) -->
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.modello</groupId>
 				<artifactId>modello-maven-plugin</artifactId>
