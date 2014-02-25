@@ -20,4 +20,6 @@ The aim of this project is to offer an integration between Nexus and Crowd that
 can be installed on Nexus 2.x OSS and offers the same level of functionality than
 its Nexus 1.8 counter part.
 
+To build the Nexus Plugin bundle, use the maven lifecycle pre-integration-test
+
 Please read on at http://patrickroumanoff.github.io/nexus-crowd-plugin/
