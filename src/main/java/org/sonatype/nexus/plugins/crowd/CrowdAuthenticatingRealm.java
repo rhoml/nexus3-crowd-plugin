@@ -92,7 +92,7 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
 		try {
 			Set<String> groups = crowdClientHolder.getRestClient().getNestedGroups(username);
 			return new SimpleAuthorizationInfo(groups);
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			throw new AuthorizationException(DEFAULT_MESSAGE, e);
 		}
 	}

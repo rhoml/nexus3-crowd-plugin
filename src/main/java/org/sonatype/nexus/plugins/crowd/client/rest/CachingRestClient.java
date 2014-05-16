@@ -10,6 +10,7 @@
  */
 package org.sonatype.nexus.plugins.crowd.client.rest;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class CachingRestClient extends RestClient {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Set<String> getNestedGroups(String username) throws RemoteException {
+	public Set<String> getNestedGroups(String username) throws RemoteException, UnsupportedEncodingException {
 		Cache cache = getCache();
 		Element elem = cache.get("nestedgroups" + username);
 		if (elem != null) {
@@ -59,7 +60,7 @@ public class CachingRestClient extends RestClient {
 	}
 
 	@Override
-	public User getUser(String userid) throws RemoteException {
+	public User getUser(String userid) throws RemoteException, UnsupportedEncodingException {
 		Cache cache = getCache();
 		Element elem = cache.get("user" + userid);
 		if (elem != null) {

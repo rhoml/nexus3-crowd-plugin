@@ -132,11 +132,12 @@ public class RestClient {
 	 * @param username
 	 * @return a set of roles (as strings)
 	 * @throws RemoteException
+	 * @throws UnsupportedEncodingException 
 	 */
-	public Set<String> getNestedGroups(String username) throws RemoteException {
+	public Set<String> getNestedGroups(String username) throws RemoteException, UnsupportedEncodingException {
 		if (LOG.isDebugEnabled()) LOG.debug("getNestedGroups(" + String.valueOf(username) + ")");
 		
-		WebResource r = client.resource(crowdServer.resolve("user/group/nested?username=" + username));
+		WebResource r = client.resource(crowdServer.resolve("user/group/nested?username=" + URLEncoder.encode(username, "UTF-8")));
 		
 		try {
 			GroupsResponse response = r.get(GroupsResponse.class);
@@ -210,11 +211,12 @@ public class RestClient {
 	 * @param userid
 	 * @return a <code>org.sonatype.security.usermanagement.User</code> from Crowd by a userid
 	 * @throws RemoteException
+	 * @throws UnsupportedEncodingException 
 	 */
-	public User getUser(String userid) throws RemoteException {
+	public User getUser(String userid) throws RemoteException, UnsupportedEncodingException {
 		if (LOG.isDebugEnabled()) LOG.debug("getUser(" + String.valueOf(userid) + ")");
 		
-		WebResource r = client.resource(crowdServer.resolve("user?username=" + userid));
+		WebResource r = client.resource(crowdServer.resolve("user?username=" + URLEncoder.encode(userid, "UTF-8")));
 		
 		UserResponse response = null;
 		try {
@@ -339,12 +341,13 @@ public class RestClient {
 	 * @param groupName
 	 * @return a <code>org.sonatype.security.authorization.Role</code> by its name
 	 * @throws RemoteException
+	 * @throws UnsupportedEncodingException 
 	 */
 	// XXX: Nexus 2.1.2 does not seem to use this method
-	public Role getGroup(String groupName) throws RemoteException {
+	public Role getGroup(String groupName) throws RemoteException, UnsupportedEncodingException {
 		if (LOG.isDebugEnabled()) LOG.debug("getGroup(" + String.valueOf(groupName) + ")");
 		
-		WebResource r = client.resource(crowdServer.resolve("group?groupname=" + groupName));
+		WebResource r = client.resource(crowdServer.resolve("group?groupname=" + URLEncoder.encode(groupName, "UTF-8")));
 		
 		GroupResponse response = null;
 		try {

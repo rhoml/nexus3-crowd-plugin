@@ -59,7 +59,7 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
                 Role role = crowdClientHolder.getRestClient().getGroup(roleId);
                 role.setSource(getSource());
                 return role;
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 throw new NoSuchRoleException("Failed to get role " + roleId + " from Crowd.", e);
             }
         } else {
