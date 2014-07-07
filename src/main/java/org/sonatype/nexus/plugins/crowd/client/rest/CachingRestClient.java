@@ -50,7 +50,7 @@ public class CachingRestClient extends RestClient {
 		Cache cache = getCache();
 		Element elem = cache.get("nestedgroups" + username);
 		if (elem != null) {
-			if (LOG.isDebugEnabled()) LOG.debug("getNestedGroups(" + username + ") from cache");
+			LOG.debug("getNestedGroups({}) from cache", username);
 			return (Set<String>) elem.getObjectValue();
 		}
 		
@@ -64,7 +64,7 @@ public class CachingRestClient extends RestClient {
 		Cache cache = getCache();
 		Element elem = cache.get("user" + userid);
 		if (elem != null) {
-			if (LOG.isDebugEnabled()) LOG.debug("getUser(" + userid + ") from cache");
+			LOG.debug("getUser({}) from cache", userid);
 			return (User) elem.getObjectValue();
 		}
 		
@@ -79,7 +79,7 @@ public class CachingRestClient extends RestClient {
 		Cache cache = getCache();
 		Element elem = cache.get("allgroups");
 		if (elem != null) {
-			if (LOG.isDebugEnabled()) LOG.debug("getAllGroups from cache");
+			LOG.debug("getAllGroups from cache");
 			return (Set<Role>) elem.getObjectValue();
 		}
 		

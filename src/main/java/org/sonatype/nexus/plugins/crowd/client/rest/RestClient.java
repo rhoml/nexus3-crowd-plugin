@@ -105,7 +105,7 @@ public class RestClient {
 	 * @throws RemoteException
 	 */
 	public String createSessionToken(String username, String password) throws RemoteException {
-		if (LOG.isDebugEnabled()) LOG.debug("session creation attempt for '" + String.valueOf(username) + "'");
+		LOG.debug("session creation attempt for '{}'", username);
 		
 		WebResource r = client.resource(crowdServer.resolve("session"));
 		
@@ -117,7 +117,7 @@ public class RestClient {
 			
 			if (LOG.isDebugEnabled()) LOG.debug(response.toString());
 			
-			LOG.info("session created for '" + String.valueOf(username) + "'");
+			LOG.info("session created for '{}'", username);
 
 			return response.token;
 		} catch (UniformInterfaceException uie) {
@@ -135,7 +135,7 @@ public class RestClient {
 	 * @throws UnsupportedEncodingException 
 	 */
 	public Set<String> getNestedGroups(String username) throws RemoteException, UnsupportedEncodingException {
-		if (LOG.isDebugEnabled()) LOG.debug("getNestedGroups(" + String.valueOf(username) + ")");
+		LOG.debug("getNestedGroups({})", username);
 		
 		WebResource r = client.resource(crowdServer.resolve("user/group/nested?username=" + URLEncoder.encode(username, "UTF-8")));
 		
@@ -214,7 +214,7 @@ public class RestClient {
 	 * @throws UnsupportedEncodingException 
 	 */
 	public User getUser(String userid) throws RemoteException, UnsupportedEncodingException {
-		if (LOG.isDebugEnabled()) LOG.debug("getUser(" + String.valueOf(userid) + ")");
+		LOG.debug("getUser({})", userid);
 		
 		WebResource r = client.resource(crowdServer.resolve("user?username=" + URLEncoder.encode(userid, "UTF-8")));
 		
@@ -247,8 +247,7 @@ public class RestClient {
 	// so we make the search in crowd on the userid OR email
 	// A Nexus user will be able to make a lookup based on the email
 	public Set<User> searchUsers(String userId, String email, Set<String> filterGroups, int maxResults) throws RemoteException, UnsupportedEncodingException {
-		if (LOG.isDebugEnabled()) LOG.debug("searchUsers(" + String.valueOf(userId)
-				+ "," + String.valueOf(email) + "," + String.valueOf(filterGroups) + "," + String.valueOf(maxResults) + ")");
+		LOG.debug("searchUsers({},{},{},{})", userId, email, filterGroups, maxResults);
 		
 		// find by user criteria 1st; then groups;
 		if (StringUtils.isNotEmpty(userId) || StringUtils.isNotEmpty(email)) {
@@ -345,7 +344,7 @@ public class RestClient {
 	 */
 	// XXX: Nexus 2.1.2 does not seem to use this method
 	public Role getGroup(String groupName) throws RemoteException, UnsupportedEncodingException {
-		if (LOG.isDebugEnabled()) LOG.debug("getGroup(" + String.valueOf(groupName) + ")");
+		LOG.debug("getGroup({})", groupName);
 		
 		WebResource r = client.resource(crowdServer.resolve("group?groupname=" + URLEncoder.encode(groupName, "UTF-8")));
 		

@@ -46,7 +46,7 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
 	@Requirement
 	private CrowdClientHolder crowdClientHolder;
 
-	private Logger logger = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);
+	private static final Logger logger = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);
 
 	public static boolean isActive() {
 		return active;

@@ -37,7 +37,7 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
     @Requirement
     private CrowdClientHolder crowdClientHolder;
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(CrowdAuthorizationManager.class);
 
     public CrowdAuthorizationManager() {
         logger.info("CrowdAuthorizationManager is starting...");
