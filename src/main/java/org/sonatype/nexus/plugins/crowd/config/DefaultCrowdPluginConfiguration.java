@@ -63,9 +63,7 @@ public class DefaultCrowdPluginConfiguration extends DefaultEventBus implements
 
             configuration = reader.read(is);
         } catch (FileNotFoundException e) {
-            logger.error(
-                    "Crowd configuration file does not exist: "
-                            + configurationFile.getAbsolutePath());
+            logger.error("Crowd configuration file does not exist: {}", configurationFile.getAbsolutePath());
         } catch (IOException e) {
         	logger.error("IOException while retrieving configuration file", e);
         } catch (XmlPullParserException e) {

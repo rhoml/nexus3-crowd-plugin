@@ -51,7 +51,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager {
     @Requirement
     private CrowdClientHolder crowdClientHolder;
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(CrowdUserManager.class);
 
     
     public CrowdUserManager() {
