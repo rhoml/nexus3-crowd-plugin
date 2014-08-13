@@ -40,7 +40,7 @@ public class CachingRestClient extends RestClient {
 		
 		ehCacheManager = CacheManager.getInstance();
 		// create a cache with max items = 10000 and TTL (live and idle) = 1 hour
-		Cache cache = new Cache(REST_RESPONSE_CACHE, 10000, false, false, 3600, 3600);
+		Cache cache = new Cache(REST_RESPONSE_CACHE, 10000, false, false, config.getCacheTTL(), config.getCacheTTL());
 		ehCacheManager.addCache(cache);
 	}
 
@@ -48,28 +48,30 @@ public class CachingRestClient extends RestClient {
 	@SuppressWarnings("unchecked")
 	public Set<String> getNestedGroups(String username) throws RemoteException, UnsupportedEncodingException {
 		Cache cache = getCache();
-		Element elem = cache.get("nestedgroups" + username);
+		String key = "nestedgroups" + username;
+		Element elem = cache.get(key);
 		if (elem != null) {
 			LOG.debug("getNestedGroups({}) from cache", username);
 			return (Set<String>) elem.getObjectValue();
 		}
 		
 		Set<String> groups = super.getNestedGroups(username);
-		cache.put(new Element("nestedgroups" + username, groups));
+		cache.put(new Element(key, groups));
 		return groups;
 	}
 
 	@Override
 	public User getUser(String userid) throws RemoteException, UnsupportedEncodingException {
 		Cache cache = getCache();
-		Element elem = cache.get("user" + userid);
+		String key = "user" + userid;
+		Element elem = cache.get(key);
 		if (elem != null) {
 			LOG.debug("getUser({}) from cache", userid);
 			return (User) elem.getObjectValue();
 		}
 		
 		User user = super.getUser(userid);
-		cache.put(new Element("user" + userid, user));
+		cache.put(new Element(key, user));
 		return user;
 	}
 
@@ -77,14 +79,15 @@ public class CachingRestClient extends RestClient {
 	@SuppressWarnings("unchecked")
 	public Set<Role> getAllGroups() throws RemoteException {
 		Cache cache = getCache();
-		Element elem = cache.get("allgroups");
+		String key = "allgroups";
+		Element elem = cache.get(key);
 		if (elem != null) {
 			LOG.debug("getAllGroups from cache");
 			return (Set<Role>) elem.getObjectValue();
 		}
 		
 		Set<Role> groups = super.getAllGroups();
-		cache.put(new Element("allgroups", groups));
+		cache.put(new Element(key, groups));
 		return groups;
 	}
 	
