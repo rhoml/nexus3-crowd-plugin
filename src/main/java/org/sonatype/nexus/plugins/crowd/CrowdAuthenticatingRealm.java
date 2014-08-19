@@ -15,6 +15,11 @@ package org.sonatype.nexus.plugins.crowd;
 import java.rmi.RemoteException;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -27,23 +32,25 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.eclipse.sisu.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.crowd.client.CrowdClientHolder;
 
-@Component(role = Realm.class, hint = CrowdAuthenticatingRealm.ROLE, description = "OSS Crowd Authentication Realm")
+@Singleton
+@Typed(Realm.class)
+@Named(CrowdAuthenticatingRealm.ROLE)
+@Description("OSS Crowd Authentication Realm")
 public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initializable, Disposable {
 
 	public static final String ROLE = "NexusCrowdAuthenticationRealm";
 	private static final String DEFAULT_MESSAGE = "Could not retrieve info from Crowd.";
 	private static boolean active;
 
-	@Requirement
+	@Inject
 	private CrowdClientHolder crowdClientHolder;
 
 	private static final Logger logger = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);

@@ -15,9 +15,11 @@ package org.sonatype.nexus.plugins.crowd.client;
 import java.util.Collections;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
@@ -35,7 +37,8 @@ import com.google.common.collect.Sets;
  * @author justin
  * @author Issa Gorissen
  */
-@Component(role = UserManager.class, hint = "Crowd")
+@Typed(UserManager.class)
+@Named("Crowd")
 public class CrowdUserManager extends AbstractReadOnlyUserManager {
 
     protected static final String REALM_NAME = "Crowd";
@@ -48,7 +51,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager {
     @Configuration(value = "100")
     private int maxResults;
 
-    @Requirement
+    @Inject
     private CrowdClientHolder crowdClientHolder;
 
     private static final Logger logger = LoggerFactory.getLogger(CrowdUserManager.class);

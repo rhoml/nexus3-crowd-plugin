@@ -16,8 +16,10 @@ import java.rmi.RemoteException;
 import java.util.Set;
 import java.util.Collections;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
@@ -31,10 +33,11 @@ import org.sonatype.security.authorization.Role;
  * @author justin
  * @author Issa Gorissen
  */
-@Component(role = AuthorizationManager.class, hint = "Crowd")
+@Typed(AuthorizationManager.class)
+@Named("Crowd")
 public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationManager {
 
-    @Requirement
+    @Inject
     private CrowdClientHolder crowdClientHolder;
 
     private static final Logger logger = LoggerFactory.getLogger(CrowdAuthorizationManager.class);

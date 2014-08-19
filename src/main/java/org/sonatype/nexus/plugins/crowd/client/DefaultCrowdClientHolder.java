@@ -14,8 +14,10 @@ package org.sonatype.nexus.plugins.crowd.client;
 
 import java.net.URISyntaxException;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -33,7 +35,8 @@ import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
  * @author Justin Edelson
  * @author Issa Gorissen
  */
-@Component(role = CrowdClientHolder.class, hint = "default")
+@Typed(CrowdClientHolder.class)
+@Named("default")
 public class DefaultCrowdClientHolder extends AbstractLogEnabled implements CrowdClientHolder, Initializable {
 
     private boolean configured = false;
@@ -42,7 +45,7 @@ public class DefaultCrowdClientHolder extends AbstractLogEnabled implements Crow
     private CachingAuthenticationManager authManager;
     private RestClient restClient;
 
-    @Requirement
+    @Inject
     private CrowdPluginConfiguration crowdPluginConfiguration;
 
     public void initialize() throws InitializationException {
