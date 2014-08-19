@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import com.google.common.collect.Sets;
  * @author justin
  * @author Issa Gorissen
  */
+@Singleton
 @Typed(UserManager.class)
 @Named("Crowd")
 public class CrowdUserManager extends AbstractReadOnlyUserManager {

@@ -18,9 +18,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +31,9 @@ import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.io.xpp3.NexusCrowdPl
 import org.sonatype.sisu.goodies.eventbus.internal.DefaultEventBus;
 import org.sonatype.sisu.goodies.eventbus.internal.guava.EventBus;
 
-@Component(role = CrowdPluginConfiguration.class, hint = "default")
+@Singleton
+@Typed(CrowdPluginConfiguration.class)
+@Named("default")
 public class DefaultCrowdPluginConfiguration extends DefaultEventBus implements
         CrowdPluginConfiguration {
 

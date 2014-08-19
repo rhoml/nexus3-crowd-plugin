@@ -14,8 +14,11 @@ package org.sonatype.nexus.plugins.crowd.api;
 
 import java.rmi.RemoteException;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -34,10 +37,12 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author Justin Edelson
  * @author Issa Gorissen
  */
-@Component(role = PlexusResource.class, hint = "CrowdTestPlexusResource")
+@Singleton
+@Typed(PlexusResource.class)
+@Named("CrowdTestPlexusResource")
 public class CrowdTestPlexusResource extends AbstractPlexusResource {
 
-    @Requirement
+    @Inject
     private CrowdClientHolder crowdClientHolder;
 
     @Override

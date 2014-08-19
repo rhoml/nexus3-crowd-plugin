@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -35,6 +36,7 @@ import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
  * @author Justin Edelson
  * @author Issa Gorissen
  */
+@Singleton
 @Typed(CrowdClientHolder.class)
 @Named("default")
 public class DefaultCrowdClientHolder extends AbstractLogEnabled implements CrowdClientHolder, Initializable {
