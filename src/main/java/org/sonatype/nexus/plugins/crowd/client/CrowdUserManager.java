@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
@@ -50,8 +49,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager {
     /**
      * The maximum number of results that will be returned from a user query.
      */
-    @Configuration(value = "100")
-    private int maxResults;
+    private int maxResults = 1000;
 
     @Inject
     private CrowdClientHolder crowdClientHolder;
