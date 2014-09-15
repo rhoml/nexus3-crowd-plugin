@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.crowd.config;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,66 +28,65 @@ import javax.inject.Singleton;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.io.xpp3.NexusCrowdPluginConfigurationXpp3Reader;
-import org.sonatype.sisu.goodies.eventbus.internal.DefaultEventBus;
-import org.sonatype.sisu.goodies.eventbus.internal.guava.EventBus;
 
 @Singleton
 @Named
 @Typed(CrowdPluginConfiguration.class)
-public class DefaultCrowdPluginConfiguration extends DefaultEventBus implements
-        CrowdPluginConfiguration {
+public class DefaultCrowdPluginConfiguration implements
+		CrowdPluginConfiguration {
 
-	private final Logger logger = LoggerFactory.getLogger(DefaultCrowdPluginConfiguration.class);
+	private final Logger logger = LoggerFactory
+			.getLogger(DefaultCrowdPluginConfiguration.class);
 
 	private File crowdConfigFile;
 	private Configuration configuration;
-    private ReentrantLock lock = new ReentrantLock();
+	private ReentrantLock lock = new ReentrantLock();
 
 	@Inject
-	public DefaultCrowdPluginConfiguration(EventBus eventBus, ApplicationDirectories applicationDirectories) {
-		super(eventBus);
-		
-		crowdConfigFile = new File(applicationDirectories.getWorkDirectory(), "conf/crowd-plugin.xml");
+	public DefaultCrowdPluginConfiguration(
+			final ApplicationConfiguration applicationConfiguration) {
+		checkNotNull(applicationConfiguration);
+
+		crowdConfigFile = new File(
+				applicationConfiguration.getConfigurationDirectory(),
+				"crowd-plugin.xml");
 	}
 
-	
-    public Configuration getConfiguration() {
-        if (configuration != null) {
-            return configuration;
-        }
+	public Configuration getConfiguration() {
+		if (configuration != null) {
+			return configuration;
+		}
 
-        lock.lock();
+		lock.lock();
 
-        FileInputStream is = null;
+		FileInputStream is = null;
 
-        try {
-            is = new FileInputStream(crowdConfigFile);
+		try {
+			is = new FileInputStream(crowdConfigFile);
 
-            NexusCrowdPluginConfigurationXpp3Reader reader = new NexusCrowdPluginConfigurationXpp3Reader();
+			NexusCrowdPluginConfigurationXpp3Reader reader = new NexusCrowdPluginConfigurationXpp3Reader();
 
-            configuration = reader.read(is);
-        } catch (FileNotFoundException e) {
-            logger.error("Crowd configuration file does not exist: {}", crowdConfigFile.getAbsolutePath());
-        } catch (IOException e) {
-        	logger.error("IOException while retrieving configuration file", e);
-        } catch (XmlPullParserException e) {
-        	logger.error("Invalid XML Configuration", e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // just closing if open
-                }
-            }
-
-            lock.unlock();
-        }
-
-        return configuration;
-    }
-
+			configuration = reader.read(is);
+		} catch (FileNotFoundException e) {
+			logger.error("Crowd configuration file does not exist: {}",
+					crowdConfigFile.getAbsolutePath());
+		} catch (IOException e) {
+			logger.error("IOException while retrieving configuration file", e);
+		} catch (XmlPullParserException e) {
+			logger.error("Invalid XML Configuration", e);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					// just closing if open
+				}
+			}
+			lock.unlock();
+		}
+		return configuration;
+	}
 }

@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.sonatype.nexus.plugins</groupId>
 		<artifactId>nexus-plugins</artifactId>
-		<version>2.9.0-04</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.roumanoff.nexus</groupId>
 	<artifactId>nexus-crowd-plugin</artifactId>
-	<version>2.9.0</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
-	<packaging>nexus-plugin</packaging>
+	<packaging>bundle</packaging>
 
 	<properties>
 		<pluginName>Nexus Crowd Integration</pluginName>
@@ -68,7 +68,6 @@
 		<dependency>
 			<groupId>org.sonatype.nexus.plugins</groupId>
 			<artifactId>nexus-restlet1x-plugin</artifactId>
-			<type>${nexus-plugin.type}</type>
 			<scope>provided</scope>
 		</dependency>
 
@@ -102,7 +101,6 @@
 			<plugin>
 				<groupId>org.codehaus.modello</groupId>
 				<artifactId>modello-maven-plugin</artifactId>
-				<version>1.2</version>
 				<executions>
 					<execution>
 						<id>crowd-config.xml</id>
@@ -124,6 +122,11 @@
 					<packageWithVersion>true</packageWithVersion>
 				</configuration>
 			</plugin>
+               <plugin>
+                  <groupId>org.apache.karaf.tooling</groupId>
+                  <artifactId>karaf-maven-plugin</artifactId>
+                </plugin>
+      
 		</plugins>
 	</build>
 </project>
