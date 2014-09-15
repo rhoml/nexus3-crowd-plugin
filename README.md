@@ -1,26 +1,18 @@
 Nexus Crowd Plugin [![Build Status](https://travis-ci.org/PatrickRoumanoff/nexus-crowd-plugin.png)](https://travis-ci.org/PatrickRoumanoff/nexus-crowd-plugin)
 ==================
 
-There is a build error as the current plugins this build relies on are not
-compatible with Maven 3.1 and I can't figure out how to setup travis to use
-a previous version.
+I have started the work to move the code base to Nexus 3.0-SNAPSHOT, this is a big change, the plugin system is now based on OSGi using Apache Karaf and Felix, all the dependencies changed, and the delivery mechanism as well. there is no more plugin-repository folder , but a deploy fodler - more testing is probably required, but the basics seems to be working. When Nexus 3.0.0 is release I will push a build as well.
 
-This plugin works with Nexus 2.9.x and Crowd 2.x
+This plugin works with Nexus 3.x and Crowd 2.x
 
-This is a fork of the original work done by sonatype, but as far as I can tell
-they stopped supporting it after Nexus 1.8, the code got moved quite a bit from
-svn to github, lost on the way and only the source for Nexus 1.3 is now
-available from gitHub.
+This is a fork of the original work done by Sonatype, but
+they stopped supporting the oss version and moved it to Nexus Pro, 
+if you need a supported version go buy their awesome software.
 
-With a bit of research, I was able to pull the latest available code base for
-Nexus 1.8 which was taged 1.6.2-SNAPSHOT from the sonatype forge repository
-thanks to the source artifact, but this later version is missing a test suite.
-
-The crowd integration is now using the Crowd REST API.
+The crowd integration is using the Crowd REST API - which allows us to ignore all Atlassian dependencies and greatly simplifies the dev process.
 
 The aim of this project is to offer an integration between Nexus and Crowd that
-can be installed on Nexus 2.x OSS and offers the same level of functionality than
-its Nexus 1.8 counter part.
+can be installed on Nexus 3.x OSS and offers some basic functionality for advanced features please look up Nexus Pro.
 
 To build the Nexus Plugin bundle, use the maven lifecycle pre-integration-test
 
