@@ -39,7 +39,8 @@ import com.google.common.collect.Sets;
  * @author Issa Gorissen
  */
 @Component(role = UserManager.class, hint = "Crowd")
-public class CrowdUserManager extends AbstractReadOnlyUserManager implements UserManager, RoleMappingUserManager {
+public class CrowdUserManager extends AbstractReadOnlyUserManager implements
+		UserManager, RoleMappingUserManager {
 
     protected static final String REALM_NAME = "Crowd";
 
@@ -64,6 +65,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getAuthenticationRealmName() {
         return REALM_NAME;
     }
@@ -71,6 +73,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getSource() {
         return SOURCE;
     }
@@ -78,6 +81,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public User getUser(String userId) throws UserNotFoundException {
         if (crowdClientHolder.isConfigured()) {
             try {
@@ -122,6 +126,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<String> listUserIds() {
         if (crowdClientHolder.isConfigured()) {
             try {
@@ -139,6 +144,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+     
     public Set<User> listUsers() {
         return searchUsers(new UserSearchCriteria());
     }
@@ -146,6 +152,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<User> searchUsers(UserSearchCriteria criteria) {
         if (!crowdClientHolder.isConfigured()) {
             UnconfiguredNotifier.unconfigured();
@@ -178,9 +185,15 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUsersRoles(String userId, String userSource, Set<RoleIdentifier> roleIdentifiers)
             throws UserNotFoundException, InvalidConfigurationException {
-        super.setUsersRoles(userId, roleIdentifiers);
+    	try {
+			User user = crowdClientHolder.getRestClient().getUser(userId);
+			user.addAllRoles(roleIdentifiers);
+		} catch (RemoteException e) {
+			logger.error("Unable to get userlist", e);
+		}
     }
 
     private User completeUserRolesAndSource(User user) throws UserNotFoundException {
