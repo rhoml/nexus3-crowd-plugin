@@ -102,6 +102,13 @@
                     <required>false</required>
                     <defaultValue>5000</defaultValue>
                 </field>
+                <field>
+                    <name>cacheTTL</name>
+                    <description>Time to live (seconds) for entries stored into cache (user's details, users' nested groups, all crowd groups)</description>
+                    <type>int</type>
+                    <required>false</required>
+                    <defaultValue>3600</defaultValue>
+                </field>
             </fields>
         </class>
     </classes>

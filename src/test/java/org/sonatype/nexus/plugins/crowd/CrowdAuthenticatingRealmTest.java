@@ -32,13 +32,13 @@ public class CrowdAuthenticatingRealmTest {
     @Test
     public void checkActiveFlag() throws Exception {
         assertFalse(CrowdAuthenticatingRealm.isActive());
-        realm.initialize();
+        realm.init();
         assertTrue(CrowdAuthenticatingRealm.isActive());
     }
 
     @After
-    public void teardown() {
-        realm.dispose();
+    public void teardown() throws Exception {
+        realm.destroy();
     }
 
 }

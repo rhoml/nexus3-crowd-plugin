@@ -16,8 +16,11 @@ import java.rmi.RemoteException;
 import java.util.Set;
 import java.util.Collections;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
@@ -31,13 +34,15 @@ import org.sonatype.security.authorization.Role;
  * @author justin
  * @author Issa Gorissen
  */
-@Component(role = AuthorizationManager.class, hint = "Crowd")
+@Singleton
+@Typed(AuthorizationManager.class)
+@Named("Crowd")
 public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationManager {
 
-    @Requirement
+    @Inject
     private CrowdClientHolder crowdClientHolder;
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(CrowdAuthorizationManager.class);
 
     public CrowdAuthorizationManager() {
         logger.info("CrowdAuthorizationManager is starting...");
@@ -59,7 +64,7 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
                 Role role = crowdClientHolder.getRestClient().getGroup(roleId);
                 role.setSource(getSource());
                 return role;
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 throw new NoSuchRoleException("Failed to get role " + roleId + " from Crowd.", e);
             }
         } else {

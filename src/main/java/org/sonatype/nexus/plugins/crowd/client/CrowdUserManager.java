@@ -12,19 +12,18 @@
  */
 package org.sonatype.nexus.plugins.crowd.client;
 
-import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.RoleIdentifier;
-import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -38,8 +37,10 @@ import com.google.common.collect.Sets;
  * @author justin
  * @author Issa Gorissen
  */
-@Component(role = UserManager.class, hint = "Crowd")
-public class CrowdUserManager extends AbstractReadOnlyUserManager implements UserManager, RoleMappingUserManager {
+@Singleton
+@Typed(UserManager.class)
+@Named("Crowd")
+public class CrowdUserManager extends AbstractReadOnlyUserManager {
 
     protected static final String REALM_NAME = "Crowd";
 
@@ -48,13 +49,12 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * The maximum number of results that will be returned from a user query.
      */
-    @Configuration(value = "100")
-    private int maxResults;
+    private int maxResults = 1000;
 
-    @Requirement
+    @Inject
     private CrowdClientHolder crowdClientHolder;
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(CrowdUserManager.class);
 
     
     public CrowdUserManager() {
@@ -64,6 +64,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getAuthenticationRealmName() {
         return REALM_NAME;
     }
@@ -71,6 +72,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getSource() {
         return SOURCE;
     }
@@ -78,12 +80,13 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public User getUser(String userId) throws UserNotFoundException {
         if (crowdClientHolder.isConfigured()) {
             try {
                 User user = crowdClientHolder.getRestClient().getUser(userId);
                 return completeUserRolesAndSource(user);
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 logger.error("Unable to look up user " + userId, e);
                 throw new UserNotFoundException(userId, e.getMessage(), e);
             }
@@ -92,16 +95,13 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Set<RoleIdentifier> getUsersRoles(String userId, String userSource) throws UserNotFoundException {
+    private Set<RoleIdentifier> getUsersRoles(String userId, String userSource) throws UserNotFoundException {
         if (SOURCE.equals(userSource)) {
             if (crowdClientHolder.isConfigured()) {
                 Set<String> roleNames = null;
                 try {
                     roleNames = crowdClientHolder.getRestClient().getNestedGroups(userId);
-                } catch (RemoteException e) {
+                } catch (Exception e) {
                     logger.error("Unable to look up user " + userId, e);
                     return Collections.emptySet();
                 }
@@ -122,6 +122,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<String> listUserIds() {
         if (crowdClientHolder.isConfigured()) {
             try {
@@ -139,6 +140,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<User> listUsers() {
         return searchUsers(new UserSearchCriteria());
     }
@@ -146,6 +148,7 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<User> searchUsers(UserSearchCriteria criteria) {
         if (!crowdClientHolder.isConfigured()) {
             UnconfiguredNotifier.unconfigured();
@@ -173,14 +176,6 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
             logger.error("Unable to get userlist", e);
             return Collections.emptySet();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setUsersRoles(String userId, String userSource, Set<RoleIdentifier> roleIdentifiers)
-            throws UserNotFoundException, InvalidConfigurationException {
-        super.setUsersRoles(userId, roleIdentifiers);
     }
 
     private User completeUserRolesAndSource(User user) throws UserNotFoundException {

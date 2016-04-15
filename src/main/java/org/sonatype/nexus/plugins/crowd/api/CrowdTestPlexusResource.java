@@ -14,8 +14,15 @@ package org.sonatype.nexus.plugins.crowd.api;
 
 import java.rmi.RemoteException;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -23,6 +30,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.plugins.crowd.client.CrowdClientHolder;
+import org.sonatype.nexus.rest.PathProtectionDescriptorBuilder;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -34,10 +42,15 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author Justin Edelson
  * @author Issa Gorissen
  */
-@Component(role = PlexusResource.class, hint = "CrowdTestPlexusResource")
+@Singleton
+@Typed(PlexusResource.class)
+@Named("CrowdTestPlexusResource")
+@Produces(MediaType.APPLICATION_XML)
+@Path(CrowdTestPlexusResource.RESOURCE_URI)
 public class CrowdTestPlexusResource extends AbstractPlexusResource {
+	public static final String RESOURCE_URI = "/crowd/test";
 
-    @Requirement
+    @Inject
     private CrowdClientHolder crowdClientHolder;
 
     @Override
@@ -47,15 +60,16 @@ public class CrowdTestPlexusResource extends AbstractPlexusResource {
 
     @Override
     public PathProtectionDescriptor getResourceProtection() {
-        return new PathProtectionDescriptor("/crowd/test", "anon");
+    	return new PathProtectionDescriptorBuilder().path(RESOURCE_URI).anon().build();
     }
 
     @Override
     public String getResourceUri() {
-        return "/crowd/test";
+        return RESOURCE_URI;
     }
 
     @Override
+    @GET
     public Object get(Context context, Request request, Response response, Variant variant)
             throws ResourceException {
         try {

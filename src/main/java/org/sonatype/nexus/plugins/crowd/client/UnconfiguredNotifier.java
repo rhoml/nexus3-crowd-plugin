@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 class UnconfiguredNotifier {
 
-    static Logger logger = LoggerFactory.getLogger(UnconfiguredNotifier.class);
+    private static final Logger logger = LoggerFactory.getLogger(UnconfiguredNotifier.class);
 
     static boolean notified = false;
 

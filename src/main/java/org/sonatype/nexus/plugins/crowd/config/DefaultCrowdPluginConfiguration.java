@@ -12,77 +12,81 @@
  */
 package org.sonatype.nexus.plugins.crowd.config;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.io.xpp3.NexusCrowdPluginConfigurationXpp3Reader;
-import org.sonatype.sisu.goodies.eventbus.internal.DefaultEventBus;
-import org.sonatype.sisu.goodies.eventbus.internal.guava.EventBus;
 
-@Component(role = CrowdPluginConfiguration.class, hint = "default")
-public class DefaultCrowdPluginConfiguration extends DefaultEventBus implements
-        CrowdPluginConfiguration {
+@Singleton
+@Named
+@Typed(CrowdPluginConfiguration.class)
+public class DefaultCrowdPluginConfiguration implements
+		CrowdPluginConfiguration {
+
+	private final Logger logger = LoggerFactory
+			.getLogger(DefaultCrowdPluginConfiguration.class);
+
+	private File crowdConfigFile;
+	private Configuration configuration;
+	private ReentrantLock lock = new ReentrantLock();
 
 	@Inject
-	public DefaultCrowdPluginConfiguration(EventBus eventBus) {
-		super(eventBus);
+	public DefaultCrowdPluginConfiguration(
+			final ApplicationConfiguration applicationConfiguration) {
+		checkNotNull(applicationConfiguration);
+
+		crowdConfigFile = new File(
+				applicationConfiguration.getConfigurationDirectory(),
+				"crowd-plugin.xml");
 	}
 
-	private final Logger logger = LoggerFactory.getLogger(DefaultCrowdPluginConfiguration.class);
-	
-    @org.codehaus.plexus.component.annotations.Configuration(value = "${nexus-work}/conf/crowd-plugin.xml")
-    private File configurationFile;
+	public Configuration getConfiguration() {
+		if (configuration != null) {
+			return configuration;
+		}
 
-    private Configuration configuration;
+		lock.lock();
 
-    private ReentrantLock lock = new ReentrantLock();
+		FileInputStream is = null;
 
-    public Configuration getConfiguration() {
-        if (configuration != null) {
-            return configuration;
-        }
+		try {
+			is = new FileInputStream(crowdConfigFile);
 
-        lock.lock();
+			NexusCrowdPluginConfigurationXpp3Reader reader = new NexusCrowdPluginConfigurationXpp3Reader();
 
-        FileInputStream is = null;
-
-        try {
-            is = new FileInputStream(configurationFile);
-
-            NexusCrowdPluginConfigurationXpp3Reader reader = new NexusCrowdPluginConfigurationXpp3Reader();
-
-            configuration = reader.read(is);
-        } catch (FileNotFoundException e) {
-            logger.error(
-                    "Crowd configuration file does not exist: "
-                            + configurationFile.getAbsolutePath());
-        } catch (IOException e) {
-        	logger.error("IOException while retrieving configuration file", e);
-        } catch (XmlPullParserException e) {
-        	logger.error("Invalid XML Configuration", e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // just closing if open
-                }
-            }
-
-            lock.unlock();
-        }
-
-        return configuration;
-    }
-
+			configuration = reader.read(is);
+		} catch (FileNotFoundException e) {
+			logger.error("Crowd configuration file does not exist: {}",
+					crowdConfigFile.getAbsolutePath());
+		} catch (IOException e) {
+			logger.error("IOException while retrieving configuration file", e);
+		} catch (XmlPullParserException e) {
+			logger.error("Invalid XML Configuration", e);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					// just closing if open
+				}
+			}
+			lock.unlock();
+		}
+		return configuration;
+	}
 }
