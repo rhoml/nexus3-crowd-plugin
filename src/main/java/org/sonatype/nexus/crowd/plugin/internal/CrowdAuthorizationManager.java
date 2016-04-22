@@ -29,10 +29,6 @@ import org.sonatype.nexus.security.privilege.Privilege;
 import org.sonatype.nexus.security.role.NoSuchRoleException;
 import org.sonatype.nexus.security.role.Role;
 
-import com.atlassian.crowd.exception.ApplicationPermissionException;
-import com.atlassian.crowd.exception.InvalidAuthenticationException;
-import com.atlassian.crowd.exception.OperationFailedException;
-
 /**
  * @author justin
  * @author Issa Gorissen
@@ -42,74 +38,54 @@ import com.atlassian.crowd.exception.OperationFailedException;
 @Named("Crowd")
 public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationManager {
 
-    private DefaultCrowdClientHolder crowdClientHolder;
+	private CachingNexusCrowdClient client;
 
-    private static final Logger logger = LoggerFactory.getLogger(CrowdAuthorizationManager.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CrowdAuthorizationManager.class);
 
-    @Inject
-    public CrowdAuthorizationManager(DefaultCrowdClientHolder holder) {
-        logger.info("CrowdAuthorizationManager is starting...");
-        crowdClientHolder = holder;
-    }
+	@Inject
+	public CrowdAuthorizationManager(CachingNexusCrowdClient holder) {
+		LOGGER.info("CrowdAuthorizationManager is starting...");
+		client = holder;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
-        throw new NoSuchPrivilegeException("Crowd plugin doesn't support privileges");
-    }
+		throw new NoSuchPrivilegeException("Crowd plugin doesn't support privileges");
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Role getRole(String roleId) throws NoSuchRoleException {
-        if (crowdClientHolder.isConfigured()) {
-            try {
-                Role role = crowdClientHolder.getRestClient().getGroup(roleId);
-                role.setSource(getSource());
-                return role;
-            } catch (Exception e) {
-                throw new NoSuchRoleException("Failed to get role " + roleId + " from Crowd.", e);
-            }
-        } else {
-            throw new NoSuchRoleException("Crowd plugin is not configured.");
-        }
-    }
+		Role role = client.findRoleByRoleId(roleId);
+		if (role == null) {
+			throw new NoSuchRoleException("Failed to get role " + roleId + " from Crowd.");
+		} else {
+			role.setSource(getSource());
+			return role;
+		}
+	}
 
-    @Override
+	@Override
 	public String getSource() {
-        return CrowdUserManager.SOURCE;
-    }
+		return CrowdUserManager.SOURCE;
+	}
 
-    @Override
+	@Override
 	public Set<Privilege> listPrivileges() {
-        return Collections.emptySet();
-    }
+		return Collections.emptySet();
+	}
 
-    @Override
+	@Override
 	public Set<Role> listRoles() {
-        if (crowdClientHolder.isConfigured()) {
-            try {
-            	Set<Role> roles = crowdClientHolder.getRestClient().getAllGroups();
-            	for (Role role : roles) {
-            		role.setSource(getSource());
-            	}
-                return roles;
-            } catch (OperationFailedException e) {
-            	logger.error("Unable to load roles", e);
-                return null;
-			} catch (InvalidAuthenticationException e) {
-				logger.error("Unable to load roles", e);
-                return null;
-			} catch (ApplicationPermissionException e) {
-				logger.error("Unable to load roles", e);
-                return null;
-			}
-        }
-        UnconfiguredNotifier.unconfigured();
-        return Collections.emptySet();
-    }
-
+		Set<Role> roles = client.findRoles();
+		for (Role role : roles) {
+			role.setSource(getSource());
+		}
+		return roles;
+	}
 }

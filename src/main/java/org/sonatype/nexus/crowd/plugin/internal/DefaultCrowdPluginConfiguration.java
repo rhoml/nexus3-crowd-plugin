@@ -19,12 +19,18 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.crowd.plugin.CrowdPluginConfiguration;
 
 import com.atlassian.crowd.service.client.ClientProperties;
 import com.atlassian.crowd.service.client.ClientPropertiesImpl;
 
+@Singleton
+@Named
 public class DefaultCrowdPluginConfiguration implements CrowdPluginConfiguration {
 
 	private static final String CONFIG_FILE = "crowd.properties";
@@ -52,7 +58,7 @@ public class DefaultCrowdPluginConfiguration implements CrowdPluginConfiguration
 			configuration = ClientPropertiesImpl.newInstanceFromProperties(p);
 
 		} catch (IOException e) {
-			logger.error("Error reading crowd properties",e);
+			logger.error("Error reading crowd properties", e);
 		}
 		lock.unlock();
 		return configuration;

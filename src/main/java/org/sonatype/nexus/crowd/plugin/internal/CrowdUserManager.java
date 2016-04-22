@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.crowd.plugin.internal;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
@@ -22,6 +21,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.crowd.plugin.CrowdAuthenticatingRealm;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 import org.sonatype.nexus.security.user.AbstractReadOnlyUserManager;
 import org.sonatype.nexus.security.user.User;
@@ -29,9 +29,6 @@ import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserNotFoundException;
 import org.sonatype.nexus.security.user.UserSearchCriteria;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 /**
@@ -43,148 +40,59 @@ import com.google.inject.Inject;
 @Named("Crowd")
 public class CrowdUserManager extends AbstractReadOnlyUserManager {
 
-    protected static final String REALM_NAME = "Crowd";
+	protected static final String SOURCE = "Crowd";
+	private static final Logger LOGGER = LoggerFactory.getLogger(CrowdUserManager.class);
 
-    protected static final String SOURCE = "Crowd";
+	private CachingNexusCrowdClient client;
 
-    /**
-     * The maximum number of results that will be returned from a user query.
-     */
-    private int maxResults = 1000;
+	@Inject
+	public CrowdUserManager(CachingNexusCrowdClient crowdClientHolder) {
+		LOGGER.info("CrowdUserManager is starting...");
+		this.client = crowdClientHolder;
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getAuthenticationRealmName() {
+		return CrowdAuthenticatingRealm.NAME;
+	}
 
-    private DefaultCrowdClientHolder crowdClientHolder;
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getSource() {
+		return SOURCE;
+	}
 
-    private static final Logger logger = LoggerFactory.getLogger(CrowdUserManager.class);
+	private User completeUserRolesAndSource(User user) {
+		user.setSource(SOURCE);
+		Set<String> roles = client.findRolesByUser(user.getUserId());
+		user.setRoles(roles.stream().map(r -> new RoleIdentifier(SOURCE, r)).collect(Collectors.toSet()));
+		return user;
+	}
 
-    @Inject
-    public CrowdUserManager(DefaultCrowdClientHolder holder) {
-        logger.info("CrowdUserManager is starting...");
-        this.crowdClientHolder = holder;
-    }
+	@Override
+	public Set<User> listUsers() {
+		return client.findUsers().stream().map(u -> completeUserRolesAndSource(u)).collect(Collectors.toSet());
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getAuthenticationRealmName() {
-        return REALM_NAME;
-    }
+	@Override
+	public Set<String> listUserIds() {
+		return client.findAllUsernames();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getSource() {
-        return SOURCE;
-    }
+	@Override
+	public Set<User> searchUsers(UserSearchCriteria criteria) {
+		return client.findUserByCriteria(criteria).stream().map(u->completeUserRolesAndSource(u)).collect(Collectors.toSet());
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public User getUser(String userId) throws UserNotFoundException {
-        if (crowdClientHolder.isConfigured()) {
-            try {
-                User user = crowdClientHolder.getRestClient().getUser(userId);
-                return completeUserRolesAndSource(user);
-            } catch (Exception e) {
-                logger.error("Unable to look up user " + userId, e);
-                throw new UserNotFoundException(userId, e.getMessage(), e);
-            }
-        } else {
-            throw new UserNotFoundException("Crowd plugin is not configured.");
-        }
-    }
-
-    private Set<RoleIdentifier> getUsersRoles(String userId, String userSource) throws UserNotFoundException {
-        if (SOURCE.equals(userSource)) {
-            if (crowdClientHolder.isConfigured()) {
-                List<String> roleNames = null;
-                try {
-                    roleNames = crowdClientHolder.getRestClient().getNestedGroups(userId);
-                } catch (Exception e) {
-                    logger.error("Unable to look up user " + userId, e);
-                    return Collections.emptySet();
-                }
-                return Sets.newHashSet(Iterables.transform(roleNames, new Function<String, RoleIdentifier>() {
-
-                    @Override
-					public RoleIdentifier apply(String from) {
-                        return new RoleIdentifier(SOURCE, from);
-                    }
-                }));
-            } else {
-                throw new UserNotFoundException("Crowd plugin is not configured.");
-            }
-        } else {
-            return Collections.emptySet();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> listUserIds() {
-        if (crowdClientHolder.isConfigured()) {
-            try {
-                return crowdClientHolder.getRestClient().getAllUsernames();
-            } catch (Exception e) {
-                logger.error("Unable to get username list", e);
-                return Collections.emptySet();
-            }
-        } else {
-            UnconfiguredNotifier.unconfigured();
-            return Collections.emptySet();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<User> listUsers() {
-        return searchUsers(new UserSearchCriteria());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<User> searchUsers(UserSearchCriteria criteria) {
-        if (!crowdClientHolder.isConfigured()) {
-            UnconfiguredNotifier.unconfigured();
-            return Collections.emptySet();
-        }
-
-        if (!SOURCE.equals(criteria.getSource())) {
-        	return Collections.emptySet();
-        }
-
-        try {
-            Set<User> result = crowdClientHolder.getRestClient().searchUsers(
-            		criteria.getUserId(),
-            		criteria.getEmail(),
-            		criteria.getOneOfRoleIds(),
-            		maxResults);
-
-            for (User user : result) {
-				completeUserRolesAndSource(user);
-			}
-
-            return result;
-
-        } catch (Exception e) {
-            logger.error("Unable to get userlist", e);
-            return Collections.emptySet();
-        }
-    }
-
-    private User completeUserRolesAndSource(User user) throws UserNotFoundException {
-        user.setSource(SOURCE);
-       	user.setRoles(getUsersRoles(user.getUserId(), SOURCE));
-        return user;
-    }
+	@Override
+	public User getUser(String userId) throws UserNotFoundException {
+		User u = client.findUserByUsername(userId);
+		return completeUserRolesAndSource(u);
+	}
 
 }
