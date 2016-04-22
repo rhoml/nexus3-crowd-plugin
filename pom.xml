@@ -19,7 +19,7 @@
 		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>nexus-crowd-plugin</artifactId>
+	<artifactId>nexus3-crowd-plugin</artifactId>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<packaging>bundle</packaging>
 
