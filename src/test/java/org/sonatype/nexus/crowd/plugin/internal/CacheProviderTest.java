@@ -1,29 +1,47 @@
 package org.sonatype.nexus.crowd.plugin.internal;
 
-import static org.junit.Assert.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CacheProviderTest {
 
+	CacheProvider p = new CacheProvider();
+
 	@Test
 	public void testPutToken() {
-		fail("Not yet implemented");
+		p.putToken("foo", "bar");
+		Assert.assertEquals("bar", p.getToken("foo").get());
 	}
 
 	@Test
 	public void testGetToken() {
-		fail("Not yet implemented");
+		p.putToken("foo", "bar");
+		Assert.assertEquals("bar", p.getToken("foo").get());
+	}
+
+	@Test
+	public void testGetTokenEmpty() {
+		p.putToken("foo", "bar");
+		Assert.assertEquals(Optional.empty(), p.getToken("foo2"));
 	}
 
 	@Test
 	public void testGetGroups() {
-		fail("Not yet implemented");
-	}
+		Set<String> set = new HashSet<>();
+		set.add("bar");
+		p.putGroups("foo", set);
+		Assert.assertEquals("bar", p.getGroups("foo").get().toArray()[0]);	}
 
 	@Test
 	public void testPutGroups() {
-		fail("Not yet implemented");
+		Set<String> set = new HashSet<>();
+		set.add("bar");
+		p.putGroups("foo", set);
+		Assert.assertEquals("bar", p.getGroups("foo").get().toArray()[0]);
 	}
 
 }

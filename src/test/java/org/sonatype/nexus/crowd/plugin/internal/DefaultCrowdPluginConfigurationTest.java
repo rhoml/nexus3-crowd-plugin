@@ -1,19 +1,23 @@
 package org.sonatype.nexus.crowd.plugin.internal;
 
-import static org.junit.Assert.*;
-
+import org.junit.Assert;
 import org.junit.Test;
+
+import com.atlassian.crowd.service.client.ClientProperties;
 
 public class DefaultCrowdPluginConfigurationTest {
 
 	@Test
 	public void testDefaultCrowdPluginConfiguration() {
-		fail("Not yet implemented");
+		DefaultCrowdPluginConfiguration c = new DefaultCrowdPluginConfiguration();
+		Assert.assertNotNull(c.getCrowdConfigFile());
 	}
 
 	@Test
 	public void testGetConfiguration() {
-		fail("Not yet implemented");
+		DefaultCrowdPluginConfiguration c = new DefaultCrowdPluginConfiguration();
+		ClientProperties configuration = c.getConfiguration();
+		Assert.assertNull(configuration);
 	}
 
 }

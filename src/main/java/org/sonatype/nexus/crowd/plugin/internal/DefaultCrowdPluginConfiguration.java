@@ -63,4 +63,8 @@ public class DefaultCrowdPluginConfiguration implements CrowdPluginConfiguration
 		lock.unlock();
 		return configuration;
 	}
+
+	public Path getCrowdConfigFile() {
+		return crowdConfigFile;
+	}
 }
