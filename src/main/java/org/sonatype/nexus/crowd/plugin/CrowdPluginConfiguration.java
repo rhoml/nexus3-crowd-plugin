@@ -20,6 +20,11 @@ import com.atlassian.crowd.service.client.ClientProperties;
  */
 public interface CrowdPluginConfiguration  {
 
+	/**
+	 * Gets the configuration.
+	 *
+	 * @return the configuration
+	 */
 	ClientProperties getConfiguration();
 
 }

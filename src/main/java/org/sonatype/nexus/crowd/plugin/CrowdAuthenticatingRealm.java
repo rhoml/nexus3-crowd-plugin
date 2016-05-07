@@ -30,41 +30,73 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.crowd.plugin.internal.CachingNexusCrowdClient;
 
+/**
+ * The Class CrowdAuthenticatingRealm.
+ */
 @Singleton
 @Description("Crowd Authentication Realm")
 public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 
 	private static final Logger logger = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);
 	public static String NAME = CrowdAuthenticatingRealm.class.getName();
-
 	private CachingNexusCrowdClient client;
 
+	/**
+	 * Instantiates a new crowd authenticating realm.
+	 *
+	 * @param client
+	 *            the client
+	 */
 	@Inject
-	public CrowdAuthenticatingRealm(final CachingNexusCrowdClient crowdClientHolder) {
-		this.client = crowdClientHolder;
+	public CrowdAuthenticatingRealm(final CachingNexusCrowdClient client) {
+		this.client = client;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.shiro.realm.CachingRealm#getName()
+	 */
 	@Override
 	public String getName() {
 		return NAME;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.shiro.realm.AuthorizingRealm#onInit()
+	 */
 	@Override
 	protected void onInit() {
 		super.onInit();
 		logger.info("Crowd Realm initialized...");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.shiro.realm.AuthorizingRealm#doGetAuthorizationInfo(org.apache
+	 * .shiro.subject.PrincipalCollection)
+	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		String username = (String) principals.getPrimaryPrincipal();
 		return new SimpleAuthorizationInfo(client.findRolesByUser(username));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.shiro.realm.AuthenticatingRealm#doGetAuthenticationInfo(org.
+	 * apache.shiro.authc.AuthenticationToken)
+	 */
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		if (!(token instanceof UsernamePasswordToken)) {
-			throw new UnsupportedTokenException(String.format("Token of type %s  is not supported. A %s  is required.",
+			throw new UnsupportedTokenException(String.format("Token of type %s  is not supported. A %s is required.",
 					token.getClass().getName(), UsernamePasswordToken.class.getName()));
 		}
 
@@ -77,6 +109,13 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 		}
 	}
 
+	/**
+	 * Creates the simple auth info.
+	 *
+	 * @param token
+	 *            the token
+	 * @return the simple authentication info
+	 */
 	private SimpleAuthenticationInfo createSimpleAuthInfo(UsernamePasswordToken token) {
 		return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), NAME);
 	}

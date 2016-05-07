@@ -47,38 +47,52 @@ import com.google.inject.Inject;
 
 @Singleton
 @Named
-public class CachingNexusCrowdClient implements NexusCrowdClient{
+public class CachingNexusCrowdClient implements NexusCrowdClient {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CachingNexusCrowdClient.class);
 
 	private static final int MAX_RESULTS = 32000;
 
 	private CrowdClient client;
-
 	private CacheProvider cache;
+	private CrowdPluginConfiguration config;
 
 	@Inject
 	public CachingNexusCrowdClient(CrowdPluginConfiguration config, CacheProvider cache) {
-		this.client = new RestCrowdClientFactory().newInstance(config.getConfiguration());
+		this.config = config;
 		this.cache = cache;
 	}
 
 	@Override
 	public boolean authenticate(UsernamePasswordToken token) {
+		// check if token is cached
 		Optional<String> cachedToken = cache.getToken(token.getUsername());
 		if (cachedToken.isPresent()) {
 			return true;
 		}
 
+		// if not, try to authenticate
 		try {
-			String crowdToken = client.authenticateSSOUser(createCrowdUserContext(token));
-			cache.putToken(token.getUsername(), crowdToken);
-			return true;
+			String crowdToken = getClient().authenticateSSOUser(createCrowdUserContext(token));
+			if (StringUtils.isNotEmpty(crowdToken)) {
+				// if authenticated, put token into cache and return
+				cache.putToken(token.getUsername(), crowdToken);
+				return true;
+			} else {
+				return false;
+			}
 		} catch (InactiveAccountException | ExpiredCredentialException | ApplicationPermissionException
 				| InvalidAuthenticationException | OperationFailedException | ApplicationAccessDeniedException e) {
 			LOGGER.error("Error while authentication", e);
 			return false;
 		}
+	}
+
+	protected CrowdClient getClient() {
+		if (client == null) {
+			client = new RestCrowdClientFactory().newInstance(config.getConfiguration());
+		}
+		return client;
 	}
 
 	private UserAuthenticationContext createCrowdUserContext(UsernamePasswordToken token) {
@@ -96,7 +110,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient{
 		}
 
 		try {
-			Set<String> groups = new HashSet<>(client.getNamesOfGroupsForUser(username, 0, MAX_RESULTS));
+			Set<String> groups = new HashSet<>(getClient().getNamesOfGroupsForUser(username, 0, MAX_RESULTS));
 			cache.putGroups(username, groups);
 			return groups;
 		} catch (UserNotFoundException | OperationFailedException | InvalidAuthenticationException
@@ -109,7 +123,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient{
 	public User findUserByUsername(String username) {
 		// TODO cache
 		try {
-			com.atlassian.crowd.model.user.User crowdUser = client.getUser(username);
+			com.atlassian.crowd.model.user.User crowdUser = getClient().getUser(username);
 			return mapUser(crowdUser);
 		} catch (UserNotFoundException | OperationFailedException | ApplicationPermissionException
 				| InvalidAuthenticationException e) {
@@ -122,7 +136,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient{
 	public Role findRoleByRoleId(String roleId) {
 		// TODO cache
 		try {
-			return mapGroup(client.getGroup(roleId));
+			return mapGroup(getClient().getGroup(roleId));
 		} catch (GroupNotFoundException | OperationFailedException | InvalidAuthenticationException
 				| ApplicationPermissionException e) {
 			LOGGER.error(String.format("Error while getting group with id %s", roleId), e);
@@ -130,10 +144,13 @@ public class CachingNexusCrowdClient implements NexusCrowdClient{
 		}
 	}
 
-	private Role mapGroup(Group croudGroup) {
+	private Role mapGroup(Group crowdGroup) {
 		Role r = new Role();
-		r.setName(croudGroup.getName());
-		r.setDescription(croudGroup.getDescription());
+		r.setRoleId(crowdGroup.getName());
+		r.setName(crowdGroup.getName());
+		r.setDescription(crowdGroup.getDescription());
+		r.setSource(CrowdUserManager.SOURCE);
+		r.setReadOnly(true);
 		return r;
 	}
 
@@ -152,7 +169,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient{
 	public Set<String> findAllUsernames() {
 		// TODO cache
 		try {
-			return new HashSet<>(client.searchUserNames(NullRestrictionImpl.INSTANCE, 0, MAX_RESULTS));
+			return new HashSet<>(getClient().searchUserNames(NullRestrictionImpl.INSTANCE, 0, MAX_RESULTS));
 		} catch (OperationFailedException | InvalidAuthenticationException | ApplicationPermissionException e) {
 			return emptyOnError(e, String.class);
 		}
@@ -162,7 +179,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient{
 	public Set<User> findUsers() {
 		// TODO cache
 		try {
-			return client.searchUsers(NullRestrictionImpl.INSTANCE, 0, MAX_RESULTS).stream().map(u -> mapUser(u))
+			return getClient().searchUsers(NullRestrictionImpl.INSTANCE, 0, MAX_RESULTS).stream().map(u -> mapUser(u))
 					.collect(Collectors.toSet());
 		} catch (OperationFailedException | InvalidAuthenticationException | ApplicationPermissionException e) {
 			return emptyOnError(e, User.class);
@@ -181,7 +198,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient{
 		}
 
 		try {
-			List<com.atlassian.crowd.model.user.User> result = client.searchUsers(Combine.allOf(restrictions), 0,
+			List<com.atlassian.crowd.model.user.User> result = getClient().searchUsers(Combine.allOf(restrictions), 0,
 					MAX_RESULTS);
 			if (CollectionUtils.isNotEmpty(criteria.getOneOfRoleIds())) {
 				result.removeIf(userInGroupFilter(criteria.getOneOfRoleIds()));
@@ -206,7 +223,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient{
 	public Set<Role> findRoles() {
 		// TODO cache
 		try {
-			List<Group> groups = client.searchGroups(NullRestrictionImpl.INSTANCE, 0, MAX_RESULTS);
+			List<Group> groups = getClient().searchGroups(NullRestrictionImpl.INSTANCE, 0, MAX_RESULTS);
 			return groups.stream().map(g -> mapGroup(g)).collect(Collectors.toSet());
 		} catch (OperationFailedException | InvalidAuthenticationException | ApplicationPermissionException e) {
 			return emptyOnError(e, Role.class);
