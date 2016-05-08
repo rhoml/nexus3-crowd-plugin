@@ -17,9 +17,21 @@ cd nexus3-crowd-plugin
 mvn install
 ```
 2. Start nexus with console
-// TODO
+Move into your nexus installation folder. Edit the file bin/nexus.vmoptions to contain the following line
+```
+-Dkaraf.startLocalConsole=true
+```
+After that (re-)start nexus. It will then startup with an interactive console enabled. (If the console doesn't show up, you may hit the Enter key after startup).
+Your console should look like this afterwards:
+```
+karaf@root()> 
+```
 3. Install plugin bundle
-// TODO
+Within the console just type
+```
+bundle:install -s file://[ABSOLUTE_PATH_TO_YOUR_JAR]
+```
+4. Configure the plugin
 
 Development
--
+//TODO

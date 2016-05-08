@@ -57,28 +57,12 @@
 			</exclusions>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>org.sonatype.nexus</groupId> -->
-		<!-- <artifactId>nexus-ssl</artifactId> -->
-		<!-- </dependency> -->
-
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-capability</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>org.sonatype.nexus</groupId> -->
-		<!-- <artifactId>nexus-rapture</artifactId> -->
-		<!-- <scope>provided</scope> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.sonatype.nexus</groupId> -->
-		<!-- <artifactId>nexus-extdirect</artifactId> -->
-		<!-- <scope>provided</scope> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>com.atlassian.crowd</groupId>
 			<artifactId>crowd-integration-client-rest</artifactId>
@@ -142,11 +126,6 @@
 					<groupId>commons-logging</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.10.19</version>
 		</dependency>
 	</dependencies>
 
