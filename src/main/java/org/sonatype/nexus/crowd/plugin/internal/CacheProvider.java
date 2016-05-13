@@ -39,7 +39,7 @@ public class CacheProvider {
 		if (!CacheManager.getInstance().cacheExists(RESPONSES_CACHE_NAME)) {
 			CacheManager.getInstance().addCache(newCache(RESPONSES_CACHE_NAME));
 		}
-		return CacheManager.getInstance().getCache(TOKEN_CACHE_NAME);
+		return CacheManager.getInstance().getCache(RESPONSES_CACHE_NAME);
 
 	}
 

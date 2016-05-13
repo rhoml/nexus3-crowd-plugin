@@ -14,57 +14,44 @@ package org.sonatype.nexus.crowd.plugin.internal;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.crowd.plugin.CrowdPluginConfiguration;
-
-import com.atlassian.crowd.service.client.ClientProperties;
-import com.atlassian.crowd.service.client.ClientPropertiesImpl;
 
 @Singleton
 @Named
-public class DefaultCrowdPluginConfiguration implements CrowdPluginConfiguration {
+public class CrowdProperties {
 
 	private static final String CONFIG_FILE = "crowd.properties";
 
-	private final Logger logger = LoggerFactory.getLogger(DefaultCrowdPluginConfiguration.class);
+	private final Logger logger = LoggerFactory.getLogger(CrowdProperties.class);
 
-	private Path crowdConfigFile;
-	private ClientProperties configuration;
-	private ReentrantLock lock = new ReentrantLock();
+	private Properties configuration;
 
-	public DefaultCrowdPluginConfiguration() {
-		crowdConfigFile = Paths.get("./etc/" + CONFIG_FILE);
-	}
-
-	@Override
-	public ClientProperties getConfiguration() {
-		if (configuration != null) {
-			return configuration;
-		}
-
-		lock.lock();
-		Properties p = new Properties();
+	public CrowdProperties() {
+		configuration = new Properties();
 		try {
-			p.load(Files.newInputStream(crowdConfigFile));
-			configuration = ClientPropertiesImpl.newInstanceFromProperties(p);
+			configuration.load(Files.newInputStream(Paths.get("./etc/" + CONFIG_FILE)));
 
 		} catch (IOException e) {
 			logger.error("Error reading crowd properties", e);
 		}
-		lock.unlock();
-		return configuration;
 	}
 
-	public Path getCrowdConfigFile() {
-		return crowdConfigFile;
+	public String getServerUrl() {
+		return configuration.getProperty("crowd.server.url");
+	}
+
+	public String getApplicationName() {
+		return configuration.getProperty("application.name");
+	}
+
+	public String getApplicationPassword() {
+		return configuration.getProperty("application.password");
 	}
 }

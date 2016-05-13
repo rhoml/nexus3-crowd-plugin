@@ -40,7 +40,7 @@ import com.google.inject.Inject;
 @Named("Crowd")
 public class CrowdUserManager extends AbstractReadOnlyUserManager {
 
-	protected static final String SOURCE = "Crowd";
+	public static final String SOURCE = "Crowd";
 	private static final Logger LOGGER = LoggerFactory.getLogger(CrowdUserManager.class);
 
 	private CachingNexusCrowdClient client;

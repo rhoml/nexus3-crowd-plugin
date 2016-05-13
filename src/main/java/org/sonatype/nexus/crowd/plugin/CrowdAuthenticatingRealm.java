@@ -13,6 +13,7 @@
 package org.sonatype.nexus.crowd.plugin;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.shiro.authc.AuthenticationException;
@@ -34,6 +35,7 @@ import org.sonatype.nexus.crowd.plugin.internal.CachingNexusCrowdClient;
  * The Class CrowdAuthenticatingRealm.
  */
 @Singleton
+@Named
 @Description("Crowd Authentication Realm")
 public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 
@@ -50,6 +52,10 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 	@Inject
 	public CrowdAuthenticatingRealm(final CachingNexusCrowdClient client) {
 		this.client = client;
+	}
+	
+	public CrowdAuthenticatingRealm() {
+		System.out.println("crowd realm constructor");
 	}
 
 	/*
@@ -83,6 +89,7 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		String username = (String) principals.getPrimaryPrincipal();
+		logger.error("doGetAuthorizationInfo for " + username);
 		return new SimpleAuthorizationInfo(client.findRolesByUser(username));
 	}
 
@@ -101,7 +108,10 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 		}
 
 		UsernamePasswordToken t = (UsernamePasswordToken) token;
+		logger.error("doGetAuthenticationInfo for " + t.getUsername());
 		boolean authenticated = client.authenticate(t);
+		logger.error("crowd authenticated: " + authenticated);
+
 		if (authenticated) {
 			return createSimpleAuthInfo(t);
 		} else {
