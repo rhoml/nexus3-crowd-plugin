@@ -53,10 +53,6 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 	public CrowdAuthenticatingRealm(final CachingNexusCrowdClient client) {
 		this.client = client;
 	}
-	
-	public CrowdAuthenticatingRealm() {
-		System.out.println("crowd realm constructor");
-	}
 
 	/*
 	 * (non-Javadoc)
