@@ -7,6 +7,8 @@ It works with Nexus 3.x and Crowd 2.x
 
 This is a fork of http://patrickroumanoff.github.io/nexus-crowd-plugin/
 
+<a href='http://ci.pingunaut.com/job/nexus3-crowd-plugin/'><img src='http://ci.pingunaut.com/buildStatus/icon?job=nexus3-crowd-plugin'></a>
+
 Usage
 -
 1. Get the plugin 
