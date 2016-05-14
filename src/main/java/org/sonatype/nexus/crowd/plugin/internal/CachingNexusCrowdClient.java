@@ -117,10 +117,13 @@ public class CachingNexusCrowdClient implements NexusCrowdClient {
 	public Set<String> findRolesByUser(String username) {
 		Optional<Set<String>> cachedGroups = cache.getGroups(username);
 		if (cachedGroups.isPresent()) {
+			LOGGER.info("return groups from cache");
 			return cachedGroups.get();
 		}
+		String restUri = restUri(String.format("user/group/direct?username=%s", username));
+		LOGGER.info("getting groups from "+restUri);
 		return CrowdMapper
-				.toRoleStrings(executeQuery(httpGet(restUri(String.format("group/nested?username=%s", username)))));
+				.toRoleStrings(executeQuery(httpGet(restUri)));
 	}
 
 	@Override

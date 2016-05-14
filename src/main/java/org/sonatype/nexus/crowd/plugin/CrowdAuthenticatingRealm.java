@@ -39,7 +39,7 @@ import org.sonatype.nexus.crowd.plugin.internal.CachingNexusCrowdClient;
 @Description("Crowd Authentication Realm")
 public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 
-	private static final Logger logger = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);
 	public static String NAME = CrowdAuthenticatingRealm.class.getName();
 	private CachingNexusCrowdClient client;
 
@@ -72,7 +72,7 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 	@Override
 	protected void onInit() {
 		super.onInit();
-		logger.info("Crowd Realm initialized...");
+		LOGGER.info("Crowd Realm initialized...");
 	}
 
 	/*
@@ -85,7 +85,7 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		String username = (String) principals.getPrimaryPrincipal();
-		logger.error("doGetAuthorizationInfo for " + username);
+		LOGGER.info("doGetAuthorizationInfo for " + username);
 		return new SimpleAuthorizationInfo(client.findRolesByUser(username));
 	}
 
@@ -104,9 +104,9 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm {
 		}
 
 		UsernamePasswordToken t = (UsernamePasswordToken) token;
-		logger.error("doGetAuthenticationInfo for " + t.getUsername());
+		LOGGER.info("doGetAuthenticationInfo for " + t.getUsername());
 		boolean authenticated = client.authenticate(t);
-		logger.error("crowd authenticated: " + authenticated);
+		LOGGER.info("crowd authenticated: " + authenticated);
 
 		if (authenticated) {
 			return createSimpleAuthInfo(t);

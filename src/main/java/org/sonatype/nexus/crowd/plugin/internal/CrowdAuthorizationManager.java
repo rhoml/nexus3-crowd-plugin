@@ -35,7 +35,7 @@ import org.sonatype.nexus.security.role.Role;
  */
 @Singleton
 @Typed(AuthorizationManager.class)
-@Named("Crowd")
+@Named("CrowdAuthorizationManager")
 public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationManager {
 
 	private CachingNexusCrowdClient client;
@@ -43,9 +43,9 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
 	private static final Logger LOGGER = LoggerFactory.getLogger(CrowdAuthorizationManager.class);
 
 	@Inject
-	public CrowdAuthorizationManager(CachingNexusCrowdClient holder) {
+	public CrowdAuthorizationManager(CachingNexusCrowdClient client) {
 		LOGGER.info("CrowdAuthorizationManager is starting...");
-		client = holder;
+		this.client = client;
 	}
 
 	/**
@@ -65,7 +65,6 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
 		if (role == null) {
 			throw new NoSuchRoleException("Failed to get role " + roleId + " from Crowd.");
 		} else {
-			role.setSource(getSource());
 			return role;
 		}
 	}
@@ -82,10 +81,6 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
 
 	@Override
 	public Set<Role> listRoles() {
-		Set<Role> roles = client.findRoles();
-		for (Role role : roles) {
-			role.setSource(getSource());
-		}
-		return roles;
+		return client.findRoles();
 	}
 }

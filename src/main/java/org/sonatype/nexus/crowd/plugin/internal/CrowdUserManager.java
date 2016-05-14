@@ -37,7 +37,7 @@ import com.google.inject.Inject;
  */
 @Singleton
 @Typed(UserManager.class)
-@Named("Crowd")
+@Named("CrowdUserManager")
 public class CrowdUserManager extends AbstractReadOnlyUserManager {
 
 	public static final String SOURCE = "Crowd";
@@ -46,9 +46,9 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager {
 	private CachingNexusCrowdClient client;
 
 	@Inject
-	public CrowdUserManager(CachingNexusCrowdClient crowdClientHolder) {
+	public CrowdUserManager(CachingNexusCrowdClient client) {
 		LOGGER.info("CrowdUserManager is starting...");
-		this.client = crowdClientHolder;
+		this.client = client;
 	}
 
 	/**
