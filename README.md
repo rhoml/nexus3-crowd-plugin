@@ -11,8 +11,7 @@ This is a fork of http://patrickroumanoff.github.io/nexus-crowd-plugin/
 
 Usage
 -
-1. Get the plugin 
-  There's no downloadable jar hosted at the moment, so you have to clone and build this repo
+1. Get the plugin (<a href='https://sec.pingunaut.com/wp-content/uploads/2016/05/nexus3-crowd-plugin-3.0.0-03.jar_.zip'>Downloadable zip file</a>) orbuild it by yourself using the these commands
   ```
   git clone https://github.com/pingunaut/nexus3-crowd-plugin.git
   cd nexus3-crowd-plugin
@@ -40,10 +39,5 @@ Usage
   After installing the Crowd realm should show up in the realm administration and you can activate it like shown below:
   <img src='https://sec.pingunaut.com/wp-content/uploads/2016/05/nexus_crowd.png'>
 
-  A good starting point is mapping one crowd role to a nexus administrator role.
-  
-  
-Development
--
-
-//TODO
+  A good starting point is mapping one crowd role to a nexus administrator role. Navigate to the role management, chose a crowd role a mapped role and map it to your desired nexus role.
+  <img src='https://sec.pingunaut.com/wp-content/uploads/2016/05/nexus-5.png'>
