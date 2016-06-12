@@ -18,7 +18,15 @@ Usage
   mvn install
   ```
   
-2. Start nexus with console
+2. Create crowd.properties file in [NEXUS_INSTALL_DIR]/etc
+  The file has to contain the following properties:
+  ```
+  crowd.server.url (e.g. http://localhost:8095/crowd)
+  application.name
+  application.password
+  ```
+
+3. Start nexus with console
   Move into your nexus installation folder. Edit the file bin/nexus.vmoptions to contain the following line
   ```
   -Dkaraf.startLocalConsole=true
@@ -29,13 +37,13 @@ Usage
   karaf@root()> 
   ```
   
-3. Install plugin bundle
+4. Install plugin bundle
   Within the console just type
   ```
   bundle:install -s file://[ABSOLUTE_PATH_TO_YOUR_JAR]
   ```
   
-4. Configure the plugin
+5. Configure the plugin
   After installing the Crowd realm should show up in the realm administration and you can activate it like shown below:
   <img src='https://sec.pingunaut.com/wp-content/uploads/2016/05/nexus_crowd.png'>
 
