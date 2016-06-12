@@ -18,8 +18,7 @@ Usage
   mvn install
   ```
   
-2. Create crowd.properties file in [NEXUS_INSTALL_DIR]/etc
-  The file has to contain the following properties:
+2. Create crowd.properties file in [NEXUS_INSTALL_DIR]/etc. The file has to contain the following properties:
   ```
   crowd.server.url (e.g. http://localhost:8095/crowd)
   application.name
