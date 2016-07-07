@@ -11,7 +11,7 @@ This is a fork of http://patrickroumanoff.github.io/nexus-crowd-plugin/
 
 Usage
 -
-1. Get the plugin (<a href='https://sec.pingunaut.com/wp-content/uploads/2016/05/nexus3-crowd-plugin-3.0.0-03.jar_.zip'>Downloadable zip file</a>) orbuild it by yourself using the these commands
+1. Get the plugin (<a href='https://pingunaut.com/blog/wp-content/uploads/2016/05/nexus3-crowd-plugin-3.0.0-03.jar_.zip'>Downloadable zip file</a>) orbuild it by yourself using the these commands
   ```
   git clone https://github.com/pingunaut/nexus3-crowd-plugin.git
   cd nexus3-crowd-plugin
