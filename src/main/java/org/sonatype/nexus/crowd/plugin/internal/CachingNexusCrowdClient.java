@@ -120,7 +120,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient {
 			LOGGER.info("return groups from cache");
 			return cachedGroups.get();
 		}
-		String restUri = restUri(String.format("user/group/direct?username=%s", username));
+		String restUri = restUri(String.format("user/group/nested?username=%s", username));
 		LOGGER.info("getting groups from "+restUri);
 		return CrowdMapper
 				.toRoleStrings(executeQuery(httpGet(restUri)));
