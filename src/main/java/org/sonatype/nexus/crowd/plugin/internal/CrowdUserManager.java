@@ -37,7 +37,7 @@ import com.google.inject.Inject;
  */
 @Singleton
 @Typed(UserManager.class)
-@Named("CrowdUserManager")
+@Named("Crowd")
 public class CrowdUserManager extends AbstractReadOnlyUserManager {
 
 	public static final String SOURCE = "Crowd";
