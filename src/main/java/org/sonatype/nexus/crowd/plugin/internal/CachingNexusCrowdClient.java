@@ -149,7 +149,7 @@ public class CachingNexusCrowdClient implements NexusCrowdClient {
 	@Override
 	public Set<User> findUserByCriteria(UserSearchCriteria criteria) {
 			String query = createQueryFromCriteria(criteria);
-			HttpResponse r = executeQuery(httpGet(restUri(String.format("search?entity-type=user&expand=user&restriction=", query))));
+			HttpResponse r = executeQuery(httpGet(restUri(String.format("search?entity-type=user&expand=user&restriction=%s", query))));
 			return CrowdMapper.toUsers(r);
 			
 
