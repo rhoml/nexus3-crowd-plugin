@@ -51,7 +51,11 @@ public class CachingNexusCrowdClient implements NexusCrowdClient {
 	@Inject
 	public CachingNexusCrowdClient(CrowdProperties props, CacheProvider cache) {
 		this.cache = cache;
-		serverUri = URI.create(props.getServerUrl());
+		// check if crowd url ends with a "/" and if so, cut it. fixes #9
+		serverUri = URI.create(
+				props.getServerUrl().endsWith("/")?
+						props.getServerUrl().substring(0, props.getServerUrl().length()-1):
+							props.getServerUrl());
 		host = new HttpHost(serverUri.getHost(), serverUri.getPort(), serverUri.getScheme());
 		CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 		credentialsProvider.setCredentials(new AuthScope(serverUri.getHost(), serverUri.getPort()),
